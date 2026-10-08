@@ -1,0 +1,26 @@
+# Dirox checks: the specs (OpenSpec) and the project knowledge (OKF) must be valid.
+# Added by /dirox-kit:setup-project. The OpenSpec version is pinned by the kit.
+name: Dirox checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  specs-and-knowledge:
+    runs-on: ubuntu-latest
+    env:
+      OPENSPEC_TELEMETRY: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: OpenSpec specs and changes
+        run: npx -y @fission-ai/openspec@1.14.1 validate --all --strict --no-interactive
+      - name: OKF knowledge
+        run: node .github/scripts/okf-validate.mjs okf

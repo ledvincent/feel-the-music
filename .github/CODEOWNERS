@@ -1,0 +1,17 @@
+# Who must review what. Replace the placeholders with GitHub users or teams
+# (for example @acme/ba-team), then turn on "Require review from Code Owners"
+# in the branch protection of the main branch.
+# The last matching line wins. One owner's approval satisfies a line.
+
+# Behaviour: the BA or the Architect approves proposals and spec changes.
+/openspec/                 @BA-TEAM @ARCHITECT-TEAM
+
+# Knowledge: decisions and architecture belong to the architects.
+/okf/                      @BA-TEAM @ARCHITECT-TEAM
+/okf/decisions/            @ARCHITECT-TEAM
+/okf/architecture/         @ARCHITECT-TEAM
+
+# The workflow itself: the tech lead.
+/CLAUDE.md                 @TECH-LEAD
+/.claude/                  @TECH-LEAD
+/.github/                  @TECH-LEAD
