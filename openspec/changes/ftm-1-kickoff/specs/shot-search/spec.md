@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Finds the shots in the moment library that fit one beat of a reel: right emotion and content, closest visual feel, and a consistent look across the sequence.
+Finds the shots in the moment library that fit one phase of a reel: right emotion and content, closest visual feel, and a consistent look across the sequence.
 
 ## ADDED Requirements
 
@@ -25,7 +25,7 @@ A search SHALL rank the shots that pass the filters by how close their look is t
 - **THEN** shots whose look matches that description come before shots that do not
 
 ### Requirement: Keep the sequence consistent
-A search SHALL use the measured brightness, warmth and motion of shots to keep the shots chosen for one reel visually consistent with the beat's colour and light palette.
+A search SHALL use the measured brightness, warmth and motion of shots to keep the shots chosen for one reel visually consistent with the phase's colour and light palette.
 
 #### Scenario: Palette respected
 - **WHEN** a search asks for a warm, dim palette

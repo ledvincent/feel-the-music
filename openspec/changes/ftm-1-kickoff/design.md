@@ -31,11 +31,13 @@ inbox/ ──► ftm ingest ─────────────────�
                        (SigLIP)                    (small VLM)
 
 Claude Code: "reel for [song] by [artist]"
-   1. ftm lyrics   ──► LRCLIB (or pasted LRC)            ─► timed lyrics
-   2. Claude       ──► section (20–30 s) + emotional arc  ─► reels/<slug>/plan.json
-   3. ftm search   ──► candidates per beat (+ contact sheet)
-      Claude       ──► final shot sequence                ─► plan.json updated
-   4. ftm render plan.json ──► reels/<slug>/reel.mp4 + note.txt
+   1. ftm lyrics   ──► LRCLIB (or pasted LRC)            ─► timed lyrics + song duration
+   2. ftm audio    ──► yt-dlp (or owner's file), duration check ─► audio/<slug>.<ext> (local only)
+   3. ftm beats    ──► beat tracker                      ─► tempo, beats, downbeats
+   4. Claude       ──► section (20–30 s, on a downbeat) + emotional arc of phases ─► reels/<slug>/plan.json
+   5. ftm search   ──► candidates per phase (+ contact sheet)
+      Claude       ──► shot sequence, every cut on a beat ─► plan.json updated
+   6. ftm render plan.json ──► reels/<slug>/reel.mp4 + note.txt
 
 ftm review ──► local page ──► rejected flag in library
 ```
@@ -44,7 +46,7 @@ ftm review ──► local page ──► rejected flag in library
 
 | Module | Job | Capability |
 |--------|-----|-----------|
-| `ftm.cli` | One command line `ftm` with sub-commands: `doctor`, `ingest`, `export`, `search`, `sheet`, `lyrics`, `render`, `review` | all |
+| `ftm.cli` | One command line `ftm` with sub-commands: `doctor`, `ingest`, `export`, `search`, `sheet`, `lyrics`, `audio`, `beats`, `render`, `review` | all |
 | `ftm.config` | Folder paths (inbox, library, reels, models cache) and settings, from one `ftm.toml` | all |
 | `ftm.ingest.split` | Shot boundaries per video | footage-ingest |
 | `ftm.ingest.cheap` | SigLIP embeddings, zero-shot tags, measured stats, junk filter | footage-ingest |
@@ -52,6 +54,8 @@ ftm review ──► local page ──► rejected flag in library
 | `ftm.library` | LanceDB access: the shot table, its schema and migrations; keeper clip export | footage-ingest, shot-search, shot-review |
 | `ftm.search` | Filters, ranking, consistency, candidate list, contact sheets | shot-search |
 | `ftm.lyrics` | LRCLIB client and LRC parser | reel-planning |
+| `ftm.audio` | Song audio (yt-dlp download or owner's file, duration check) and beat grid (tempo, beats, downbeats) | reel-planning |
+| `ftm.timing` | Cut planning: snaps cuts to beats, lyric hints, shot length per phase pace | reel-planning |
 | `ftm.render` | Reel plan → 9:16 video, grade, lyrics, note | reel-render |
 | `ftm.review` | Local review page | shot-review |
 | `.claude/skills/reel/` | The "reel for [song] by [artist]" workflow for Claude Code: calls the CLI and does the director step | reel-planning |
@@ -62,7 +66,8 @@ The system has no HTTP API. Its interface is the `ftm` CLI; each command prints 
 
 ### Connections
 
-- **LRCLIB** (`lrclib.net`): free, no key; timed lyrics in LRC format. Only network call at run time.
+- **LRCLIB** (`lrclib.net`): free, no key; timed lyrics in LRC format and the track's duration.
+- **YouTube, through yt-dlp**: the song's audio, searched by song and artist, for beat analysis only. Never exported or committed.
 - **Hugging Face Hub**: one-time model downloads into the models cache.
 - **Instagram**: none. The owner posts by hand and adds the song from Instagram's audio library at the noted start time.
 
@@ -70,12 +75,12 @@ The system has no HTTP API. Its interface is the `ftm` CLI; each command prints 
 
 - **Shot** (one LanceDB row): `shot_id`, `source_file`, `source_hash`, `start_s`, `end_s`, `duration_s`; cheap pass: `embedding` (SigLIP vector), `emotion_tags`, `content_tags`, `shot_type_tag`, `brightness`, `warmth`, `motion`, `junk_reason` (null when kept); expensive pass: `caption`, `emotion` (from the fixed list), `people_count`, `shot_type`, `setting`, `time_of_day`; lifecycle: `keeper`, `clip_path`, `rejected`, `rejected_at`; `ingested_at`, `pipeline_version`.
 - **Source** (one row per ingested file): `source_hash`, `path`, `ingested_at`, `shot_count`. Lets ingest skip a file it already processed.
-- **Reel plan** (`reels/<slug>/plan.json`): song, artist, section start and end in the song, timed lyric lines with their key word, beats (feeling, visual direction, palette, time range), and the chosen `shot_id`s with in/out points. It is the contract between Claude (planning) and the renderer.
+- **Reel plan** (`reels/<slug>/plan.json`): song, artist, section start and end in the song, timed lyric lines with their key word, the audio file and its source, the beat grid (tempo, beat times, downbeat times), the phases of the arc (feeling, visual direction, palette, time range), and the chosen `shot_id`s with in/out points and cut times (each a beat time). It is the contract between Claude (planning) and the renderer.
 - **Emotion list**: one fixed list in code, shared by zero-shot tagging, the VLM prompt and search filters (see D6).
 
 ### Environments
 
-One: the owner's PC. Folders (configurable): `inbox/`, `library/` (LanceDB tables and `clips/`), `reels/`, `models/` (Hugging Face cache). None of them is committed; all are git-ignored. Tests run on CPU with tiny fixtures and fake models, so CI on GitHub needs no GPU.
+One: the owner's PC. Folders (configurable): `inbox/`, `library/` (LanceDB tables and `clips/`), `audio/` (song audio, analysis only), `reels/`, `models/` (Hugging Face cache). None of them is committed; all are git-ignored. Tests run on CPU with tiny fixtures and fake models, so CI on GitHub needs no GPU.
 
 ## Decisions
 
@@ -121,6 +126,17 @@ LRCLIB's search by track and artist returns synced LRC. If none is found or the 
 ### D12. Review page: local, served by `ftm review`
 A small local page (FastAPI + plain HTML, bound to `127.0.0.1`) streams keeper clips with their caption and tags and a reject button. Rejection sets `rejected` on the shot row; search always filters `rejected = false`. Chosen in ticket 17; low cost to change.
 
+### D13. Song audio from YouTube with yt-dlp, owner's file as override — Decision record needed
+Chosen by the owner in review. `ftm audio` searches YouTube for "[song] [artist]" (preferring official audio uploads), downloads the audio only, and checks its duration against LRCLIB's (more than 2 s apart: stop and ask). An audio file given by the owner skips the download. Audio is used only to find beats; it stays in `audio/` (git-ignored) and is never in the export.
+Alternatives: owner-provided files only (no terms-of-service issue, one manual step per song); Spotify's audio-analysis API (closed to new apps since late 2024).
+
+### D14. Beat tracking: Beat This! (proposed, confirmed in backlog ticket 15) — Decision record needed
+A recent PyTorch beat and downbeat tracker that handles pop and indie songs well, runs on CPU or GPU, and gives downbeats directly. librosa's beat tracker is the fallback (simpler, beats only, downbeats estimated from the bar length). madmom is avoided: its Windows build is painful. Benchmarked in ticket 15 on a few songs tapped by hand.
+
+### D15. Cuts are snapped to beats; lyrics only hint — Decision record needed
+Every cut time in the reel plan is a beat time from the beat grid; the renderer cuts at those times to the nearest frame (one frame is 33 ms at 30 fps, under what the eye notices). A lyric line starting within a quarter beat of a beat may motivate a cut on that beat, never off it. Phase changes and the section start fall on downbeats. Calm phases hold shots for more beats than intense ones. Songs with no steady beat fall back to lyric line starts.
+Alternative: cut on lyric lines (the original plan), which lags visibly behind the music because sung lines rarely start on the beat.
+
 ## Risks / Trade-offs
 
 - [VRAM: a 7B VLM may not fit with its vision encoder in 8 GB] → start with 3B or 4-bit; D3 keeps one model loaded; ticket 6 measures peak VRAM.
@@ -128,6 +144,9 @@ A small local page (FastAPI + plain HTML, bound to `127.0.0.1`) streams keeper c
 - [Lyrics drift if the Instagram start time is not exact] → note the start to 0.1 s; open question 3 may make the section start snap to whole seconds.
 - [Copyright takedowns from film footage] → open question 1; record source and licence per shot so risky shots can be filtered out later.
 - [Windows wheels for CUDA libraries] → Python 3.12 and `uv`; `ftm doctor` checks the CUDA build, the GPU and FFmpeg before anything else.
+- [yt-dlp breaks when YouTube changes, or finds the wrong version] → keep yt-dlp updated (`ftm doctor` reports its version); the duration check (D13) catches most wrong versions; the owner's file is always an option.
+- [LRC timings and the downloaded audio come from different recordings] → duration check; open question 7 on aligning the first line.
+- [Beat tracker wrong on rubato or half-time songs] → benchmark in ticket 15; the plan shows the tempo for a quick sanity check; fallback to lyric line starts.
 - [Long ingest of full films] → resumable passes (D3); ingest can stop and resume.
 
 ## Migration Plan

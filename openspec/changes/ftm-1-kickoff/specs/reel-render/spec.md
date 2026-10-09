@@ -17,6 +17,17 @@ The renderer SHALL output a 9:16 video of the planned sequence with no audio tra
 - **WHEN** a reel is rendered
 - **THEN** the video has no audio track
 
+### Requirement: Frame-accurate cuts
+The renderer SHALL cut between shots at the times in the reel plan, measured from the section start, to the nearest video frame, so cuts planned on the beat stay on the beat.
+
+#### Scenario: Cut on time
+- **WHEN** the plan puts a cut at a given time in the section
+- **THEN** the cut happens in the video within one frame of that time
+
+#### Scenario: Length matches the section
+- **WHEN** a reel is rendered
+- **THEN** the video lasts the length of the section, within one frame
+
 ### Requirement: Shared colour grade
 The renderer SHALL apply one shared colour grade to every shot of a reel, so shots from different sources look like one film.
 

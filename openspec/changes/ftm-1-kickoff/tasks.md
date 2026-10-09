@@ -9,7 +9,7 @@ Phase 2 of the kickoff (after the plan PR is approved). The kickoff writes no co
 
 ## 2. Decisions
 
-Decisions D7 (shot splitter), D8 (vision-language model) and D9 (renderer) are proposals; their backlog tickets record them at close.
+Decisions D7 (shot splitter), D8 (vision-language model), D9 (renderer) and D14 (beat tracker) are proposals; their backlog tickets record them at close.
 
 - [ ] 2.1 Write `okf/decisions/001-claude-code-orchestrates-local-tools.md` (D1) and verify it validates
 - [ ] 2.2 Write `okf/decisions/002-python-312-uv-windows-cuda.md` (D2) and verify it validates
@@ -18,6 +18,8 @@ Decisions D7 (shot splitter), D8 (vision-language model) and D9 (renderer) are p
 - [ ] 2.5 Write `okf/decisions/005-siglip-embeddings-and-tags.md` (D5) and verify it validates
 - [ ] 2.6 Write `okf/decisions/006-fixed-emotion-list.md` (D6, with the list as approved) and verify it validates
 - [ ] 2.7 Write `okf/decisions/007-keeper-clips-as-library.md` (D10) and verify it validates
+- [ ] 2.8 Write `okf/decisions/008-song-audio-from-youtube.md` (D13) and verify it validates
+- [ ] 2.9 Write `okf/decisions/009-cuts-on-the-beat.md` (D15) and verify it validates
 
 ## 3. Domain terms
 
@@ -25,7 +27,8 @@ Decisions D7 (shot splitter), D8 (vision-language model) and D9 (renderer) are p
 - [ ] 3.2 Write `okf/domain/moment-library.md` and verify it validates
 - [ ] 3.3 Write `okf/domain/shot.md` (including keeper shot and rejected shot) and verify it validates
 - [ ] 3.4 Write `okf/domain/section.md` (the strongest 20–30 seconds and its start time) and verify it validates
-- [ ] 3.5 Write `okf/domain/emotional-arc.md` (beats with feeling, visual direction, palette) and verify it validates
+- [ ] 3.5 Write `okf/domain/emotional-arc.md` (phases with feeling, visual direction, palette) and verify it validates
+- [ ] 3.10 Write `okf/domain/beat-grid.md` (tempo, beats, downbeats, and the cut-on-the-beat rule) and verify it validates
 - [ ] 3.6 Write `okf/domain/palette.md` and `okf/domain/grade.md` and verify they validate
 - [ ] 3.7 Write `okf/domain/cheap-pass.md` and `okf/domain/expensive-pass.md` and verify they validate
 - [ ] 3.8 Write `okf/domain/contact-sheet.md` and verify it validates
@@ -36,6 +39,7 @@ Decisions D7 (shot splitter), D8 (vision-language model) and D9 (renderer) are p
 - [ ] 4.1 Write `okf/data/shot.md` (the LanceDB shot row and source row) and verify it validates
 - [ ] 4.2 Write `okf/data/reel-plan.md` (the plan.json contract) and verify it validates
 - [ ] 4.3 Write `okf/integrations/lrclib.md` and verify it validates
+- [ ] 4.4 Write `okf/integrations/youtube-audio.md` (yt-dlp, duration check, terms-of-service note) and verify it validates
 
 ## 5. Link and index
 
@@ -46,7 +50,7 @@ Decisions D7 (shot splitter), D8 (vision-language model) and D9 (renderer) are p
 
 - [ ] 6.1 Fill `CLAUDE.md` "Project" (what it is, stack and versions) and verify it stays under 150 lines
 - [ ] 6.2 Fill `CLAUDE.md` "Commands" (install, run, test, lint with uv) and verify each line names a real command from the tech stack
-- [ ] 6.3 Fill `CLAUDE.md` "Project rules" (folders never committed, one GPU model at a time, no paid APIs, fixed emotion list) and verify no TODO is left that the plan answers
+- [ ] 6.3 Fill `CLAUDE.md` "Project rules" (folders never committed, one GPU model at a time, cuts always on the beat, no paid APIs, fixed emotion list) and verify no TODO is left that the plan answers
 - [ ] 6.4 Fill `.github/CODEOWNERS` with the reviewers named on the PR and verify no placeholder is left
 
 ## Workflow follow-up
