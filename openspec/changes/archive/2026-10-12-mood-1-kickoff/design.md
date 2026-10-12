@@ -14,7 +14,7 @@ No `okf/decisions/` or `okf/architecture/` files exist yet; phase 2 of this kick
 ## Goals / Non-Goals
 
 **Goals:**
-- A small set of local command-line tools that do the heavy work (ingest, search, render), driven by Claude Code, which does the judgement (section, arc, final shot choice).
+- A small set of local command-line tools that do the heavy work (ingest, search, render), driven by Claude Code, which does the judgement (emotional arc, meaningful words, final shot choice); the owner sets the section.
 - A data model that lets each backlog ticket add one column or pass without rewriting the library.
 - Each GPU step loads one model, processes a batch, and unloads it before the next.
 
@@ -116,7 +116,7 @@ MOOD-1 says splitting runs on the GPU and the tool is not chosen. TransNetV2 is 
 MOOD-1 leaves it open. Requirements: fits under 8 GB alongside nothing else, follows a JSON output format, gives good short captions. Candidates to benchmark in ticket 6 on ~50 library shots: Qwen2.5-VL-3B-Instruct (fp16 or 8-bit), a 4-bit Qwen2.5-VL-7B, MiniCPM-V. Output is validated against the fixed emotion list (D6) and a JSON schema; invalid output is retried once, then the shot is marked for review.
 
 ### D9. Rendering: FFmpeg filter graphs with ASS subtitles for lyrics (proposed, confirmed in backlog ticket 10) — Decision record needed
-FFmpeg (free, NVENC hardware encoding on the 3060 Ti) crops and scales each shot to 9:16, applies one shared grade (`lut3d` with a `.cube` LUT, plus `eq` for exposure), concatenates without audio, and burns lyrics from a generated ASS file (libass gives fonts, outlines, fades and per-word styling for the key-word emphasis).
+FFmpeg (free, NVENC hardware encoding on the 3060 Ti) crops and scales each shot to 9:16, applies one shared grade (`lut3d` with a `.cube` LUT, plus `eq` for exposure), concatenates without audio, and burns lyrics from a generated ASS file (libass gives fonts, outlines, fades and per-word styling for the meaningful-word emphasis).
 Alternatives: MoviePy (slower, harder typographic control); Remotion (React-based, strong typography, but adds Node and a headless browser to the stack).
 
 ### D10. Keeper clips as the long-term library — Decision record needed
@@ -126,7 +126,7 @@ Keeper shots are exported as short H.264 clips (720p wide side, high quality) un
 LRCLIB's search by track and artist gives the lyrics and the recording's duration. If the song is not found, the owner pastes the lyrics. Timing comes from word alignment (D16), not from LRC line timestamps. The meaningful word of each line is chosen by Claude in the director step and stored in the reel plan; the renderer emphasises it and the cut planner may cut on it.
 
 ### D12. Review page: local, served by `mood review`
-A small local page (FastAPI + plain HTML, bound to `127.0.0.1`) streams keeper clips with their caption and tags and a reject button. Rejection sets `rejected` on the shot row; search always filters `rejected = false`. Chosen in ticket 17; low cost to change.
+A small local page (FastAPI + plain HTML, bound to `127.0.0.1`) streams keeper clips with their caption and tags and a reject button. Rejection sets `rejected` on the shot row; search always filters `rejected = false`. Chosen in ticket 20; low cost to change.
 
 ### D13. Song audio from YouTube with yt-dlp, owner's file as override — Decision record needed
 Chosen by the owner in review, accepting that it goes against YouTube's terms of service. `mood audio` searches YouTube for "[song] [artist]" (preferring official audio uploads), downloads the audio only, and checks its duration against LRCLIB's (more than 2 s apart: stop and ask; with pasted lyrics there is no LRCLIB duration, so the owner confirms the audio's duration against Instagram's). An audio file given by the owner skips the download. Audio is used only for beats and word timings; it stays in `audio/` (git-ignored) and is never in the export.
@@ -137,17 +137,17 @@ A recent PyTorch beat and downbeat tracker that handles pop and indie songs well
 
 ### D15. Cuts on beats, placed by the lyrics — Decision record needed
 Decided with the owner in review. The first shot starts at the section start (the owner's exact time, even between beats); every later cut is a beat time. Cut points are ranked: (1) the first beat after a lyric line ends, (2) the beat closest to the start of the line's meaningful word, (3) any other beat, only when needed to keep a shot within its usable length or the phase's pace. Phase changes fall on downbeats. Calm phases hold shots for more beats than intense ones. The renderer cuts at those times to the nearest frame (33 ms at 30 fps, under what the eye notices). Indie love songs nearly always have a steady beat; when the beat in the section is irregular, the owner is warned instead of the plan silently changing rules.
+Alternative: cut on lyric lines (the original plan), which lags visibly behind the music because sung lines rarely start on the beat.
 
 ### D16. Word alignment on the song audio (proposed, confirmed in backlog ticket 16) — Decision record needed
 Cutting on a meaningful word needs word timings, and LRC only times lines (often from a different upload). A local aligner matches the lyric text to our audio and gives the start and end of every word: WhisperX (wav2vec2 alignment, a few GB of VRAM, loaded alone per D3) or stable-ts (Whisper-based, simpler install). Chosen on a few songs checked by ear. It also removes any offset between LRCLIB and the recording.
-Alternative: cut on lyric lines (the original plan), which lags visibly behind the music because sung lines rarely start on the beat.
 
 ## Risks / Trade-offs
 
 - [VRAM: a 7B VLM may not fit with its vision encoder in 8 GB] → start with 3B or 4-bit; D3 keeps one model loaded; ticket 6 measures peak VRAM.
 - [Zero-shot emotion tags are noisy] → tags only filter broadly; the VLM emotion and Claude's final read of captions decide; review rejections remove the worst.
 - [Lyrics drift if the Instagram start time is not set exactly] → the note gives the start to 0.1 s; the owner can give section times in whole seconds if Instagram's slider is coarse; the renderer never moves the owner's times.
-- [Copyright takedowns from film footage] → open question 1; record source and licence per shot so risky shots can be filtered out later.
+- [Copyright takedowns from film footage] → deferred by the owner (open question 1); if needed, source and licence columns are added later through `pipeline_version` (D4).
 - [Windows wheels for CUDA libraries] → Python 3.12 and `uv`; `mood doctor` checks the CUDA build, the GPU and FFmpeg before anything else.
 - [yt-dlp breaks when YouTube changes, or finds the wrong version] → keep yt-dlp updated (`mood doctor` reports its version); the duration check (D13) catches most wrong versions; the owner's file is always an option.
 - [Our audio is not the recording Instagram plays] → duration check (D13); word alignment (D16) on our audio keeps lyrics, beats and cuts on one clock; preview the first reels in Instagram's editor.
