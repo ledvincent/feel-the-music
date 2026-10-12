@@ -19,7 +19,7 @@ The system SHALL take every video file placed in the `inbox/` folder (films, com
 
 #### Scenario: Processed file leaves inbox
 - **WHEN** a video has been ingested
-- **THEN** it is no longer in `inbox/`
+- **THEN** it is moved from `inbox/` to `processed/`, and the library points to its new place
 
 ### Requirement: Split videos into shots
 The system SHALL split each ingested video into individual shots, each with its source file and its start and end time in that file.
@@ -36,19 +36,19 @@ The system SHALL compute for every shot: an embedding of its look, zero-shot tag
 - **THEN** each shot has a look embedding, emotion, content and shot-type tags, and brightness, warmth and motion values
 
 ### Requirement: Remove unusable shots
-The system SHALL remove shots that are credits, shots with burned-in subtitles and black frames, so they never reach the expensive pass or a reel.
+The system SHALL delete shots that are credits, shots with burned-in subtitles and black frames, so they are not stored and never reach the expensive pass or a reel.
 
 #### Scenario: Credits removed
 - **WHEN** a video's end credits are ingested
-- **THEN** no credits shot is kept in the moment library
+- **THEN** no credits shot is in the moment library
 
 #### Scenario: Subtitles removed
 - **WHEN** a shot shows burned-in subtitles
-- **THEN** the shot is not kept in the moment library
+- **THEN** the shot is not in the moment library
 
 #### Scenario: Black frames removed
 - **WHEN** a shot is black frames
-- **THEN** the shot is not kept in the moment library
+- **THEN** the shot is not in the moment library
 
 ### Requirement: Expensive pass on surviving shots
 The system SHALL describe every shot that survives the cheap pass with a caption, one emotion from the fixed emotion list, the number of people, the shot type, the setting and the time of day.
@@ -76,8 +76,12 @@ Every model used by ingest SHALL run within 8 GB of VRAM, with only one large mo
 - **THEN** it completes without running out of GPU memory and without calling a paid service
 
 ### Requirement: Export keeper shots as small clips
-The system SHALL be able to export keeper shots as small clips so the library stays around 5–15 GB and source videos are not needed to render a reel.
+The system SHALL be able to export keeper shots as small clips so the library stays around 5–15 GB and source videos are not needed to render a reel. A keeper is a shot that survived junk removal and has its expensive pass, and that the owner has not rejected. Knowledge: `okf/domain/shot.md`
 
 #### Scenario: Keeper exported
 - **WHEN** a shot is a keeper and export runs
 - **THEN** a small clip of that shot exists and a reel can use it without the source video
+
+#### Scenario: Not a keeper
+- **WHEN** a shot has no expensive pass yet, or the owner rejected it
+- **THEN** export makes no clip for it

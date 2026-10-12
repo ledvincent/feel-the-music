@@ -18,11 +18,11 @@ The renderer SHALL output a 9:16 video of the planned sequence with no audio tra
 - **THEN** the video has no audio track
 
 ### Requirement: Frame-accurate cuts
-The renderer SHALL cut between shots at the times in the reel plan, measured from the section start, to the nearest video frame, so cuts planned on the beat stay on the beat.
+The renderer SHALL cut between shots at the times in the reel plan, which are song times, placing each at its song time minus the section start, to the nearest video frame, so cuts planned on the beat stay on the beat.
 
 #### Scenario: Cut on time
-- **WHEN** the plan puts a cut at a given time in the section
-- **THEN** the cut happens in the video within one frame of that time
+- **WHEN** the plan puts a cut at a song time
+- **THEN** the cut happens in the video within one frame of that time minus the section start
 
 #### Scenario: Length matches the section
 - **WHEN** a reel is rendered
@@ -36,15 +36,15 @@ The renderer SHALL apply one shared colour grade to every shot of a reel, so sho
 - **THEN** the same grade is applied to all of them
 
 ### Requirement: Styled lyrics
-The renderer SHALL burn the section's lyrics into the video in a stylish way, each line shown at its timing relative to the section start, with the key word of each line emphasised.
+The renderer SHALL burn the section's lyrics into the video in a stylish way, each line shown from its first word's start to its last word's end, relative to the section start, with the meaningful word of each line emphasised.
 
 #### Scenario: Lyrics on time
 - **WHEN** a lyric line starts at a given time in the section
 - **THEN** it appears in the video at that time
 
-#### Scenario: Key word emphasised
+#### Scenario: Meaningful word emphasised
 - **WHEN** a lyric line is shown
-- **THEN** its key word is styled differently from the rest of the line
+- **THEN** its meaningful word is styled differently from the rest of the line
 
 ### Requirement: Start-time note
 The renderer SHALL write a note next to each reel giving the time in the song where the Instagram audio must start for the lyrics to line up.

@@ -39,7 +39,7 @@ A search SHALL return its top candidates with their captions and tags, so Claude
 - **THEN** each candidate shows its shot id, caption, emotion, shot type and measured stats
 
 ### Requirement: Contact sheets
-The system SHALL produce a contact sheet of a search's top results, a single image of frames from each shot, to check search quality by eye.
+The system SHALL produce a contact sheet of a search's top results, a single image with one frame from each shot, to check search quality by eye.
 
 #### Scenario: Contact sheet for a search
 - **WHEN** a contact sheet is asked for a search
