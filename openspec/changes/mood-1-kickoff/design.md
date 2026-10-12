@@ -34,7 +34,8 @@ Claude Code: "reel for [song] by [artist]"
    1. mood lyrics   ──► LRCLIB (or pasted LRC)            ─► timed lyrics + song duration
    2. mood audio    ──► yt-dlp (or owner's file), duration check ─► audio/<slug>.<ext> (local only)
    3. mood beats    ──► beat tracker                      ─► tempo, beats, downbeats
-   4. Claude       ──► section (20–30 s, on a downbeat) + emotional arc of phases ─► reels/<slug>/plan.json
+   4. Owner        ──► section start and end times (exact; Claude suggests on request) ─► confirmed
+      Claude       ──► emotional arc of phases            ─► reels/<slug>/plan.json
    5. mood search   ──► candidates per phase (+ contact sheet)
       Claude       ──► shot sequence, every cut on a beat ─► plan.json updated
    6. mood render plan.json ──► reels/<slug>/reel.mp4 + note.txt
@@ -85,7 +86,7 @@ One: the owner's PC. Folders (configurable): `inbox/`, `library/` (LanceDB table
 ## Decisions
 
 ### D1. Claude Code is the orchestrator and the director; Python tools do the heavy work — Decision record needed
-The "reel for…" request is a Claude Code skill. Judgement steps (section choice, emotional arc, final shot pick) are done by Claude in the session, at no extra cost on the subscription. Deterministic and GPU steps are `mood` CLI commands.
+The "reel for…" request is a Claude Code skill. Judgement steps (emotional arc, final shot pick, and section suggestions when asked) are done by Claude in the session, at no extra cost on the subscription. Deterministic and GPU steps are `mood` CLI commands.
 Alternatives: a local LLM for the director step (costs VRAM, weaker writing); the Claude API (paid, excluded by the brief).
 
 ### D2. Python 3.12 on Windows with PyTorch + CUDA, managed with uv — Decision record needed
@@ -134,7 +135,7 @@ Alternatives: owner-provided files only (no terms-of-service issue, one manual s
 A recent PyTorch beat and downbeat tracker that handles pop and indie songs well, runs on CPU or GPU, and gives downbeats directly. librosa's beat tracker is the fallback (simpler, beats only, downbeats estimated from the bar length). madmom is avoided: its Windows build is painful. Benchmarked in ticket 15 on a few songs tapped by hand.
 
 ### D15. Cuts are snapped to beats; lyrics only hint — Decision record needed
-Every cut time in the reel plan is a beat time from the beat grid; the renderer cuts at those times to the nearest frame (one frame is 33 ms at 30 fps, under what the eye notices). A lyric line starting within a quarter beat of a beat may motivate a cut on that beat, never off it. Phase changes and the section start fall on downbeats. Calm phases hold shots for more beats than intense ones. Songs with no steady beat fall back to lyric line starts.
+Every cut time in the reel plan is a beat time from the beat grid; the renderer cuts at those times to the nearest frame (one frame is 33 ms at 30 fps, under what the eye notices). A lyric line starting within a quarter beat of a beat may motivate a cut on that beat, never off it. Phase changes fall on downbeats. The section start is the owner's exact time, so the first shot starts there even between beats; every later cut is on a beat. Calm phases hold shots for more beats than intense ones. Songs with no steady beat fall back to lyric line starts.
 Alternative: cut on lyric lines (the original plan), which lags visibly behind the music because sung lines rarely start on the beat.
 
 ## Risks / Trade-offs

@@ -14,7 +14,7 @@ In scope (behaviour planned now, built by the backlog tickets):
 - A **moment library**: video files dropped into `inbox/` are split into shots on the GPU, analysed in a cheap pass (every shot) and an expensive pass (surviving shots only), and stored as one row per shot. Keeper shots can be exported as small clips.
 - A **shot search** that filters on emotion and content, ranks by visual feel, keeps the sequence visually consistent, and produces contact sheets to check search quality.
 - A **reel renderer** that outputs a silent 9:16 video with one shared colour grade, styled lyrics with the key word of each line emphasised, and a note giving the song start time.
-- A **per-song workflow** started in Claude Code with "reel for [song] by [artist]": the song's audio (downloaded with yt-dlp, used only for analysis) and its beat grid, timed lyrics, choice of the strongest 20–30 seconds, an emotional arc of phases, and shot selection with **every cut on a beat** (lyric lines are a hint, never the rule), so scene changes never lag behind the music.
+- A **per-song workflow** started in Claude Code with "reel for [song] by [artist]": the song's audio (downloaded with yt-dlp, used only for analysis) and its beat grid, timed lyrics, the 20–30 second section **set by the owner with exact start and end times** (Claude can suggest, never chooses), an emotional arc of phases, and shot selection with **every cut on a beat** (lyric lines are a hint, never the rule), so scene changes never lag behind the music.
 - A **review page** to reject bad shots so results improve over time.
 - Project foundation (phase 2 of this ticket): `okf/` seeded with the architecture, key decisions and main terms; `CLAUDE.md` filled in; first specs archived into `openspec/specs/`.
 
@@ -31,7 +31,7 @@ Out of scope:
 
 - `footage-ingest`: turning video files in `inbox/` into analysed, stored shots in the moment library (splitting, cheap pass, expensive pass, junk removal, keeper clip export).
 - `shot-search`: finding and ranking shots in the moment library for one phase of the arc (filters, visual-feel ranking, consistency, contact sheets).
-- `reel-planning`: the per-song workflow from a song request to a chosen shot sequence (song audio, beat grid, timed lyrics, section choice, emotional arc, shot selection with cuts on the beat).
+- `reel-planning`: the per-song workflow from a song request to a chosen shot sequence (song audio, beat grid, timed lyrics, owner-set section, emotional arc, shot selection with cuts on the beat).
 - `reel-render`: producing the final silent 9:16 reel from a planned sequence (framing, frame-accurate cuts, shared grade, styled lyrics, start-time note).
 - `shot-review`: reviewing shots and rejecting bad ones so they stop being used.
 
@@ -57,7 +57,8 @@ These scenarios are not stated in MOOD-1; the ticket owner adds them to Jira (or
 - `shot-search` / **No match**: a search with no matching shot says so instead of returning unrelated shots.
 - `reel-planning` / **Lyrics not found**: when LRCLIB has no timed lyrics, the workflow asks for them to be pasted.
 - `shot-review` / **Rejected shot never returned**: a rejected shot is never returned by search again.
-- Beat sync, added during review (all of these): `reel-planning` / **Audio downloaded**, **Audio given by the owner**, **Wrong version**, **Beats detected**, **No clear beat**, **Section starts on a downbeat**, **Phases change on downbeats**, **Cut on a beat**, **Lyric line as a hint**, **Pace follows the phase**, **Shot long enough**; `reel-render` / **Cut on time**, **Length matches the section**.
+- Changed from MOOD-1, decided in review: MOOD-1 says Claude picks the strongest 20–30 seconds. Instead the owner sets the section with exact times (`reel-planning` / **Times used exactly**, **Section confirmed**, **No times given**, **Unusual length**). Update the ticket text.
+- Beat sync, added during review (all of these): `reel-planning` / **Audio downloaded**, **Audio given by the owner**, **Wrong version**, **Beats detected**, **No clear beat**, **Phases change on downbeats**, **Cut on a beat**, **Lyric line as a hint**, **Pace follows the phase**, **Shot long enough**; `reel-render` / **Cut on time**, **Length matches the section**.
 
 ## Open questions
 
@@ -93,7 +94,7 @@ One row per proposed Jira ticket, each one PR, in build-plan order. Sizes follow
 | 13 | Timed lyrics: LRCLIB lookup (with the song's duration) and paste fallback | big | 1 | reel-planning |
 | 14 | Song audio: yt-dlp download from song and artist, owner-given file instead, duration check against LRCLIB | big | 13 | reel-planning |
 | 15 | Beat grid: choose the beat tracker, detect tempo, beats and downbeats, store them in the reel plan | normal | 14 | reel-planning |
-| 16 | Section choice: pick the strongest 20–30 seconds, starting on a downbeat | normal | 13, 15 | reel-planning |
+| 16 | Section: owner gives exact start and end times, Claude suggests on request, owner confirms | normal | 13, 15 | reel-planning |
 | 17 | Director step: emotional arc of phases (feeling, visual direction, palette), changing on downbeats | normal | 16 | reel-planning |
 | 18 | Shot selection with every cut on a beat (lyrics as a hint, pace by phase), and the "reel for [song] by [artist]" command end to end | normal | 8, 11, 12, 17 | reel-planning |
 | 19 | Review page: browse shots and reject bad ones | big | 7 | shot-review |

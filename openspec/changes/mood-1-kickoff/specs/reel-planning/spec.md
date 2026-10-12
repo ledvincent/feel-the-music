@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Takes a song request made in Claude Code and turns it into a planned reel: the song's audio and beat grid, the timed lyrics of its strongest 20–30 seconds, an emotional arc of phases, and the sequence of shots, cut on the beat, that will be rendered.
+Takes a song request made in Claude Code and turns it into a planned reel: the song's audio and beat grid, the timed lyrics of the 20–30 second section the owner sets, an emotional arc of phases, and the sequence of shots, cut on the beat, that will be rendered.
 
 ## ADDED Requirements
 
@@ -11,7 +11,7 @@ The workflow SHALL start when the owner asks Claude Code for "reel for [song] by
 
 #### Scenario: Request to reel
 - **WHEN** the owner asks for "reel for [song] by [artist]"
-- **THEN** the workflow runs through audio, beats, lyrics, section, arc, shot selection and render, and gives the reel and its start-time note
+- **THEN** the workflow asks for the section times and runs through audio, beats, lyrics, section, arc, shot selection and render, and gives the reel and its start-time note
 
 ### Requirement: Song audio
 The workflow SHALL get the song's audio by downloading it with yt-dlp from the song and artist, or use an audio file given by the owner. The audio is used only for analysis: it stays local and is never part of the exported reel. The downloaded version SHALL be checked against the song's duration from LRCLIB, so a live version, remix or edit is not used by mistake.
@@ -54,16 +54,24 @@ The workflow SHALL get the song's timed lyrics from LRCLIB, or use timed lyrics 
 - **WHEN** LRCLIB has no timed lyrics for the song
 - **THEN** the workflow asks the owner to paste them
 
-### Requirement: Choose the strongest section
-The workflow SHALL pick the strongest 20 to 30 seconds of the song, usually the chorus, starting on a downbeat, and record where that section starts in the song.
+### Requirement: Owner sets the section
+The owner SHALL set the section of the song the reel uses, by giving its exact start and end times. The workflow uses those times exactly, never moving them (not even to a beat), and never chooses the section itself. When asked, Claude can suggest sections with their lyrics, but the owner sets the times. Before planning shots, the workflow shows the section (times, length, lyrics) and the owner confirms it. Knowledge: `okf/domain/section.md`
 
-#### Scenario: Section length
-- **WHEN** a section is chosen
-- **THEN** it lasts between 20 and 30 seconds and its start time in the song is known
+#### Scenario: Times used exactly
+- **WHEN** the owner gives a start and an end time
+- **THEN** the section starts and ends at exactly those times, even when they fall between beats
 
-#### Scenario: Section starts on a downbeat
-- **WHEN** a section is chosen and the song has a beat grid
-- **THEN** the section starts on a downbeat
+#### Scenario: Section confirmed
+- **WHEN** the section is set
+- **THEN** the workflow shows its times, length and lyrics and waits for the owner to confirm before planning shots
+
+#### Scenario: No times given
+- **WHEN** the owner asks for a reel without giving section times
+- **THEN** the workflow asks for them, and offers to suggest sections; it does not pick one itself
+
+#### Scenario: Unusual length
+- **WHEN** the section the owner sets is shorter than 20 or longer than 30 seconds
+- **THEN** the workflow says so and continues only if the owner confirms
 
 ### Requirement: Emotional arc
 The workflow SHALL write an emotional arc for the section: a few phases, each with a feeling, a visual direction and one colour and light palette, based on the song's feeling rather than its literal words. Phases change on downbeats. Knowledge: `okf/domain/emotional-arc.md`
@@ -92,7 +100,7 @@ The workflow SHALL search the moment library for each phase and pick a sequence 
 - **THEN** no shot appears twice
 
 ### Requirement: Cuts on the beat
-Every cut between two shots SHALL fall on a beat of the beat grid, so scene changes never lag behind the music. Lyrics are a hint, not the rule: when a lyric line starts close to a beat, the cut may be placed on that beat. The pace follows the phase: calm phases hold shots for several beats, intense phases cut faster. Knowledge: `okf/domain/beat-grid.md`
+Every cut between two shots SHALL fall on a beat of the beat grid (the reel's first shot starts at the section start, wherever it falls), so scene changes never lag behind the music. Lyrics are a hint, not the rule: when a lyric line starts close to a beat, the cut may be placed on that beat. The pace follows the phase: calm phases hold shots for several beats, intense phases cut faster. Knowledge: `okf/domain/beat-grid.md`
 
 #### Scenario: Cut on a beat
 - **WHEN** the shot sequence is planned

@@ -26,7 +26,7 @@ Decisions D7 (shot splitter), D8 (vision-language model), D9 (renderer) and D14 
 - [ ] 3.1 Write `okf/domain/reel.md` and verify it validates
 - [ ] 3.2 Write `okf/domain/moment-library.md` and verify it validates
 - [ ] 3.3 Write `okf/domain/shot.md` (including keeper shot and rejected shot) and verify it validates
-- [ ] 3.4 Write `okf/domain/section.md` (the strongest 20–30 seconds and its start time) and verify it validates
+- [ ] 3.4 Write `okf/domain/section.md` (the 20–30 seconds set by the owner with exact start and end times, and its start time in the song) and verify it validates
 - [ ] 3.5 Write `okf/domain/emotional-arc.md` (phases with feeling, visual direction, palette) and verify it validates
 - [ ] 3.10 Write `okf/domain/beat-grid.md` (tempo, beats, downbeats, and the cut-on-the-beat rule) and verify it validates
 - [ ] 3.6 Write `okf/domain/palette.md` and `okf/domain/grade.md` and verify they validate
