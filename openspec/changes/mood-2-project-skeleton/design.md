@@ -19,19 +19,19 @@ Code is written on a laptop without CUDA (Intel Arc) and run on the RTX 3060 Ti 
 
 **D1. src layout, package `mood`, console script `mood`.** `src/mood/` with `cli.py`, `config.py`, `doctor.py`; `[project.scripts] mood = "mood.cli:app"`. The src layout keeps tests running against the installed package. Alternative: flat layout; it lets tests import the working tree by accident.
 
-**D2. Typer for the CLI.** Sub-commands as functions with type hints, good help text, built on Click. A shared callback adds the global `--json` option, stored on the context, so every command gets it without repeating it. Errors (unknown command, bad config) are caught at the top and printed as `{"ok": false, "error": "..."}` when `--json` is set. Alternatives: argparse (more boilerplate per command, no shared-option pattern), Click directly (Typer is Click with less code). Decision record needed: the CLI library shapes every later command.
+**D2. Typer for the CLI.** Sub-commands as functions with type hints, good help text, built on Click. `--json` is accepted in both positions (spec: "Json flag in either position"): the root callback takes it before the command (`mood --json doctor`), and each command also declares it through one shared option helper (`mood doctor --json`, the order Claude naturally types). Either one sets JSON mode on the context. A test over all registered commands checks that none forgets the helper. Errors (unknown command, bad config) are caught at the top and printed as `{"ok": false, "error": "..."}` when `--json` is set. Alternatives: argparse (more boilerplate per command, no shared-option pattern), Click directly (Typer is Click with less code). Decision record needed: the CLI library shapes every later command.
 
 **D3. One result shape.** Each command returns a plain dict (or a dataclass turned into one); one renderer prints it as JSON (`ok`, plus command fields) or as text. Commands never `print` directly. This makes "every command accepts json" one parametrised test over all registered commands.
 
 **D4. Config with `tomllib` and a frozen dataclass.** `mood.toml` at the project root; the project root is the folder holding `pyproject.toml`, or the `MOOD_ROOT` environment variable when set (tests use a temporary folder). Table `[folders]` with keys `inbox`, `processed`, `library`, `audio`, `reels`, `models`; unknown keys are an error, so typos are caught. A commented `mood.example.toml` is committed; `mood.toml` itself is git-ignored, as it holds paths for one machine. Alternative: pydantic-settings; one more dependency for six paths.
 
-**D5. Doctor as a list of independent checks.** Each check is a function returning `{name, ok, value, hint}` and catching its own errors, so one failure never stops the others. Probes:
+**D5. Doctor as a list of independent checks.** Each check is a function returning `{name, status, value, hint}` (`status` is `ok`, `warning` or `failed`; only `failed` makes the exit code non-zero) and catching its own errors, so one failure never stops the others. Probes:
 - GPU and VRAM: `nvidia-smi --query-gpu=name,memory.total,driver_version --format=csv,noheader` (works even when PyTorch is CPU-only, so the hint can say which is wrong).
 - PyTorch: `torch.__version__`, `torch.version.cuda`, `torch.cuda.is_available()`, device name. Imported inside the check, so `mood --help` stays fast.
 - FFmpeg: `ffmpeg -version`, first line.
 - yt-dlp: `yt_dlp.version.__version__`.
 - Folders: from config, existence only.
-Probes are passed in (a small `Probes` object with defaults), so tests give fakes. VRAM below 8 GB is reported as a warning, not a failure: the 8 GB budget is a design rule (003), not a hard limit for the check.
+Probes are passed in (a small `Probes` object with defaults), so tests give fakes. VRAM below 8 GB is `warning`, not `failed` (spec: "Low VRAM is a warning"): the 8 GB budget is a design rule (003), not a hard limit for the check.
 
 **D6. PyTorch from the CUDA index through uv.** `[tool.uv.sources] torch = { index = "pytorch-cu124" }` with an explicit index `https://download.pytorch.org/whl/cu124`, marked `explicit = true` so only torch comes from it. On the laptop the same lock installs the CUDA wheel; it runs on CPU, and doctor reports the PyTorch check as failed there, which is correct. Alternative: a CPU extra for the laptop; two lock variants for little gain. Decision record needed only if the CUDA version changes later; it is pinned in `uv.lock` as the tech stack says.
 

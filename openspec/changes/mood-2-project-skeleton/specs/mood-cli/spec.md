@@ -7,11 +7,15 @@ The `mood` command line every Moodcut tool runs through: machine-readable output
 ## ADDED Requirements
 
 ### Requirement: JSON output on every command
-Every `mood` command SHALL accept `--json`. With it, the command SHALL print exactly one JSON document on standard output, errors included, so Claude Code can read the result. Without it, the command prints text for a person. Knowledge: `okf/decisions/001-claude-code-orchestrates-local-tools.md`
+Every `mood` command SHALL accept `--json`, before or after the command name. With it, the command SHALL print exactly one JSON document on standard output, errors included, so Claude Code can read the result. Without it, the command prints text for a person. Knowledge: `okf/decisions/001-claude-code-orchestrates-local-tools.md`
 
 #### Scenario: Every command accepts json
 - **WHEN** any registered `mood` command runs with `--json`
 - **THEN** its standard output parses as one JSON document
+
+#### Scenario: Json flag in either position
+- **WHEN** `mood --json doctor` and `mood doctor --json` run on the same machine
+- **THEN** both succeed and print the same JSON document
 
 #### Scenario: Unknown command in JSON mode
 - **WHEN** `mood --json` is given a command that does not exist
@@ -33,11 +37,15 @@ The `mood` CLI SHALL read the working folders (inbox, processed, library, audio,
 - **THEN** the command stops with a message naming the file and the problem, and exits non-zero
 
 ### Requirement: Doctor checks the machine
-`mood doctor` SHALL check that an NVIDIA GPU is visible with its total VRAM, that PyTorch is a CUDA build that can use that GPU, that FFmpeg runs, and that yt-dlp runs, and SHALL report each check's result with the version or value found. Knowledge: `okf/architecture/tech-stack.md`, `okf/decisions/002-python-312-uv-windows-cuda.md`
+`mood doctor` SHALL check that an NVIDIA GPU is visible with its total VRAM, that PyTorch is a CUDA build that can use that GPU, that FFmpeg runs, and that yt-dlp runs. It SHALL mark each check ok, warning or failed, with the version or value found. VRAM below the 8 GB budget is a warning, not a failure. Knowledge: `okf/architecture/tech-stack.md`, `okf/decisions/002-python-312-uv-windows-cuda.md`, `okf/decisions/003-one-gpu-model-at-a-time.md`
 
 #### Scenario: Healthy machine
 - **WHEN** `mood doctor` runs on a machine where every check passes
 - **THEN** it lists the GPU name and VRAM, the PyTorch and CUDA versions, the FFmpeg version and the yt-dlp version, each marked ok, and exits 0
+
+#### Scenario: Low VRAM is a warning
+- **WHEN** the GPU has less than 8 GB of VRAM and every other check passes
+- **THEN** the VRAM check is marked warning with the amount found, and `mood doctor` exits 0
 
 #### Scenario: CPU-only PyTorch fails the check
 - **WHEN** the installed PyTorch has no CUDA support or sees no GPU
@@ -48,7 +56,7 @@ The `mood` CLI SHALL read the working folders (inbox, processed, library, audio,
 - **THEN** it lists the working folders in use and whether each exists
 
 ### Requirement: Doctor reports every failure
-`mood doctor` SHALL run every check even when an earlier one fails, SHALL give a fix hint for each failed check, and SHALL exit non-zero when any check fails.
+`mood doctor` SHALL run every check even when an earlier one fails, SHALL give a fix hint for each failed check, and SHALL exit non-zero when any check fails. Warnings alone do not change the exit code.
 
 #### Scenario: Doctor reports every failure
 - **WHEN** FFmpeg is missing and yt-dlp is missing
