@@ -129,7 +129,7 @@ LRCLIB's search by track and artist gives the lyrics and the recording's duratio
 A small local page (FastAPI + plain HTML, bound to `127.0.0.1`) streams keeper clips with their caption and tags and a reject button. Rejection sets `rejected` on the shot row; search always filters `rejected = false`. Chosen in ticket 17; low cost to change.
 
 ### D13. Song audio from YouTube with yt-dlp, owner's file as override — Decision record needed
-Chosen by the owner in review. `mood audio` searches YouTube for "[song] [artist]" (preferring official audio uploads), downloads the audio only, and checks its duration against LRCLIB's (more than 2 s apart: stop and ask; with pasted lyrics there is no LRCLIB duration, so the owner confirms the audio's duration against Instagram's). An audio file given by the owner skips the download. Audio is used only for beats and word timings; it stays in `audio/` (git-ignored) and is never in the export.
+Chosen by the owner in review, accepting that it goes against YouTube's terms of service. `mood audio` searches YouTube for "[song] [artist]" (preferring official audio uploads), downloads the audio only, and checks its duration against LRCLIB's (more than 2 s apart: stop and ask; with pasted lyrics there is no LRCLIB duration, so the owner confirms the audio's duration against Instagram's). An audio file given by the owner skips the download. Audio is used only for beats and word timings; it stays in `audio/` (git-ignored) and is never in the export.
 Alternatives: owner-provided files only (no terms-of-service issue, one manual step per song); Spotify's audio-analysis API (closed to new apps since late 2024).
 
 ### D14. Beat tracking: Beat This! (proposed, confirmed in backlog ticket 15) — Decision record needed

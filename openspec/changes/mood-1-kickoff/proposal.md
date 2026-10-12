@@ -58,19 +58,19 @@ These scenarios are not stated in MOOD-1; the ticket owner adds them to Jira (or
 - `shot-search` / **No match**: a search with no matching shot says so instead of returning unrelated shots.
 - `reel-planning` / **Lyrics not found**: when LRCLIB does not have the song, the workflow asks for the lyrics to be pasted.
 - `shot-review` / **Rejected shot never returned**: a rejected shot is never returned by search again.
-- Changed from MOOD-1, decided in review: MOOD-1 says Claude picks the strongest 20–30 seconds. Instead the owner sets the section with exact times (`reel-planning` / **Times used exactly**, **Section confirmed**, **No times given**, **Unusual length**). Update the ticket text.
-- Beat sync, added during review (all of these): `reel-planning` / **Audio downloaded**, **Audio given by the owner**, **Wrong version**, **No reference duration**, **Beats detected**, **Unsteady beat**, **Words aligned**, **Phases change on downbeats**, **Meaningful word per line**, **Cut on a beat**, **Cut after a line**, **Cut on a meaningful word**, **Pace follows the phase**, **Shot long enough**; `reel-render` / **Cut on time**, **Length matches the section**.
+
+MOOD-1's description was updated on 2026-10-12 with the review decisions (owner-set section, song audio with yt-dlp, beats and word timings, cuts on the beat, junk shots deleted, keepers, `processed/`), so those scenarios are covered by the ticket.
 
 ## Open questions
 
 For the reviewers (Tech lead, Architect, PM) to answer on the PR:
 
-1. **Footage sourcing** (from the ticket): public-domain and stock footage carry no risk; recent films carry takedown risk as the page grows. Which sources are allowed in `inbox/`? Should each shot record its source and licence so risky shots can be filtered out later?
+1. **Footage sourcing** (from the ticket): deferred by the owner, to be discussed before films are ingested at scale. It does not block this plan: if each shot must later record its source and licence, the Source table gains those columns through a `pipeline_version` migration (D4).
 2. **Originality** (from the ticket): reposting other people's edits limits reach. Should compilations or fan edits be accepted in `inbox/` at all, or only raw footage?
 3. **Sync** (from the ticket): burned-in lyrics only line up if the Instagram audio starts at the exact noted time. The owner's times are used exactly and never moved. How precise is Instagram's start slider? If it is coarse, the owner gives section times in whole seconds. Check by previewing the first reels in Instagram's editor.
 4. **Emotion list**: the fixed list of emotions shared by tagging, captions and search. Proposed in `design.md` (D6); confirm or edit.
 5. **Tool choices not made yet**: the vision-language model, the shot-splitting tool, the rendering tool, the beat tracker and the word aligner. Recommendations are in `design.md` (D7–D9, D14, D16); each is confirmed in its backlog ticket.
-6. **Audio download** (added in review): downloading with yt-dlp goes against YouTube's terms of service. The audio is only analysed locally and never published, so the practical risk is low, but YouTube changes regularly break yt-dlp (keep it updated) and search can return the wrong version (the duration check catches most of these). Accept, or prefer owner-provided files?
+6. **Audio download**: answered in review. The owner accepts yt-dlp (D13), knowing it goes against YouTube's terms of service; the audio is only analysed locally and never published. An audio file from the owner always replaces the download.
 7. **Lyrics and audio from different recordings**: answered in review. LRCLIB gives only the text and duration; word timings come from aligning the lyrics to our audio (D16), so lyrics, beats and cuts share one clock.
 8. **Machine**: `nvidia-smi` and `ffmpeg` were not found on the PATH of this PC. Confirm the NVIDIA driver is installed; FFmpeg is installed by the first backlog ticket.
 
