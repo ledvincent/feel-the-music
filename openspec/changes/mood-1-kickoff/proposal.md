@@ -66,7 +66,7 @@ MOOD-1's description was updated on 2026-10-12 with the review decisions (owner-
 For the reviewers (Tech lead, Architect, PM) to answer on the PR:
 
 1. **Footage sourcing** (from the ticket): deferred by the owner, to be discussed before films are ingested at scale. It does not block this plan: if each shot must later record its source and licence, the Source table gains those columns through a `pipeline_version` migration (D4).
-2. **Originality** (from the ticket): reposting other people's edits limits reach. Should compilations or fan edits be accepted in `inbox/` at all, or only raw footage?
+2. **Originality** (from the ticket): answered in review. Compilations and fan edits are accepted in `inbox/`, like raw footage; originality comes from the sequencing, the song choice and the lyrics, not from the footage alone.
 3. **Sync** (from the ticket): burned-in lyrics only line up if the Instagram audio starts at the exact noted time. The owner's times are used exactly and never moved. How precise is Instagram's start slider? If it is coarse, the owner gives section times in whole seconds. Check by previewing the first reels in Instagram's editor.
 4. **Emotion list**: the fixed list of emotions shared by tagging, captions and search. Proposed in `design.md` (D6); confirm or edit.
 5. **Tool choices not made yet**: the vision-language model, the shot-splitting tool, the rendering tool, the beat tracker and the word aligner. Recommendations are in `design.md` (D7–D9, D14, D16); each is confirmed in its backlog ticket.

@@ -107,7 +107,7 @@ Current choice in MOOD-1. One model gives both the look embedding and the zero-s
 Alternatives: CLIP ViT-L/14 (weaker on fine visual detail); SigLIP 2 (newer; can replace if a test set shows better results — embeddings would then be recomputed).
 
 ### D6. A fixed emotion list — Decision record needed
-Proposed (to confirm in review): `heartbreak`, `longing`, `tenderness`, `intimacy`, `joy`, `euphoria`, `nostalgia`, `loneliness`, `melancholy`, `hope`, `calm`, `tension`. Defined once in code; tagging, the VLM prompt and search all use it. Changing the list later means re-tagging.
+Approved in review as the starting list: `heartbreak`, `longing`, `tenderness`, `intimacy`, `joy`, `euphoria`, `nostalgia`, `loneliness`, `melancholy`, `hope`, `calm`, `tension`. Defined once in code; tagging, the VLM prompt and search all use it. The owner expects to add more emotions later, especially happier tones; adding one is a list change plus a `pipeline_version` bump, so the next ingest run re-tags existing shots (D3).
 
 ### D7. Shot splitting: TransNetV2 on the GPU (proposed, confirmed in backlog ticket 2) — Decision record needed
 MOOD-1 says splitting runs on the GPU and the tool is not chosen. TransNetV2 is a small neural cut detector (well under 1 GB VRAM) that handles fades and dissolves better than threshold methods. PySceneDetect `ContentDetector` is the fallback (CPU, simpler, fine for hard cuts).

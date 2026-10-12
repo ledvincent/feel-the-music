@@ -7,7 +7,7 @@ Turns any video file placed in the inbox into individual, analysed shots stored 
 ## ADDED Requirements
 
 ### Requirement: Ingest videos from the inbox
-The system SHALL take every video file placed in the `inbox/` folder (films, compilations, stock footage, home movies) as input to the moment library, whatever its source.
+The system SHALL take every video file placed in the `inbox/` folder (films, compilations, fan edits, stock footage, home movies) as input to the moment library, whatever its source.
 
 #### Scenario: Video in inbox is ingested
 - **WHEN** a video file is in `inbox/` and ingest runs
