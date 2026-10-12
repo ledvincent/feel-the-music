@@ -72,7 +72,7 @@ For the reviewers (Tech lead, Architect, PM) to answer on the PR:
 5. **Tool choices not made yet**: the vision-language model, the shot-splitting tool, the rendering tool, the beat tracker and the word aligner. Recommendations are in `design.md` (D7–D9, D14, D16); each is confirmed in its backlog ticket.
 6. **Audio download**: answered in review. The owner accepts yt-dlp (D13), knowing it goes against YouTube's terms of service; the audio is only analysed locally and never published. An audio file from the owner always replaces the download.
 7. **Lyrics and audio from different recordings**: answered in review. LRCLIB gives only the text and duration; word timings come from aligning the lyrics to our audio (D16), so lyrics, beats and cuts share one clock.
-8. **Machine**: `nvidia-smi` and `ffmpeg` were not found on the PATH of this PC. Confirm the NVIDIA driver is installed; FFmpeg is installed by the first backlog ticket.
+8. **Machine**: answered in review. Moodcut runs on a separate PC with the RTX 3060 Ti; its NVIDIA driver (which provides `nvidia-smi`) and FFmpeg are checked by `mood doctor` in ticket 1. The laptop used for planning (Intel Arc, no CUDA) is only for writing code; tests run on CPU.
 
 ## Backlog
 
