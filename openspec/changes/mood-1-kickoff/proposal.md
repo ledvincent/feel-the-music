@@ -1,4 +1,4 @@
-Jira: FTM-1
+Jira: MOOD-1
 Size: big
 
 # Proposal
@@ -48,7 +48,7 @@ None (new project).
 
 ## Not in Jira yet
 
-These scenarios are not stated in FTM-1; the ticket owner adds them to Jira (or drops them) before approving:
+These scenarios are not stated in MOOD-1; the ticket owner adds them to Jira (or drops them) before approving:
 
 - `footage-ingest` / **Same file twice**: a video already ingested is not ingested again.
 - `footage-ingest` / **Processed file leaves inbox**: an ingested video is moved out of `inbox/` so the inbox shows only what is left to do.
@@ -78,7 +78,7 @@ One row per proposed Jira ticket, each one PR, in build-plan order. Sizes follow
 
 | # | Title | Size | Depends on | Capability |
 |---|-------|------|-----------|------------|
-| 1 | Project skeleton: Python 3.12 package, `ftm` CLI, config of folders, test and lint, `ftm doctor` checking GPU, VRAM and FFmpeg | normal | — | — (tooling) |
+| 1 | Project skeleton: Python 3.12 package, `mood` CLI, config of folders, test and lint, `mood doctor` checking GPU, VRAM and FFmpeg | normal | — | — (tooling) |
 | 2 | Shot splitting: ingest videos from `inbox/`, split into shots on the GPU, store one row per shot in LanceDB | big | 1 | footage-ingest |
 | 3 | Cheap pass: SigLIP embeddings and measured brightness, warmth and motion for every shot | normal | 2 | footage-ingest |
 | 4 | Junk removal: drop credits, subtitles and black frames | normal | 3 | footage-ingest |

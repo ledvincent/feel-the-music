@@ -43,7 +43,7 @@ Decisions D7 (shot splitter), D8 (vision-language model), D9 (renderer) and D14 
 
 ## 5. Link and index
 
-- [ ] 5.1 Add `Knowledge:` lines from the change's spec requirements to the concepts above and verify `openspec validate ftm-1-kickoff --strict` passes
+- [ ] 5.1 Add `Knowledge:` lines from the change's spec requirements to the concepts above and verify `openspec validate mood-1-kickoff --strict` passes
 - [ ] 5.2 Add the `okf/log.md` line, run `okf-validate.mjs okf --write` and verify it reports 0 errors
 
 ## 6. CLAUDE.md and owners

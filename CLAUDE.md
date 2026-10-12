@@ -1,4 +1,4 @@
-# FTM Test
+# Moodcut
 
 <!-- Loaded into every message, so every line costs tokens. Keep it under ~150 lines.
      Put knowledge in okf/ and behaviour in openspec/, and point to them. TODO lines are filled by /dirox-kit:kickoff. -->
@@ -6,7 +6,7 @@
 ## Project
 - What it is: TODO one sentence
 - Stack: TODO language, framework, database, hosting (with versions)
-- Jira project key: FTM
+- Jira project key: MOOD
 
 ## Commands
 - Install: TODO

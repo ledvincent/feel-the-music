@@ -2,7 +2,7 @@
 
 ## Context
 
-New project, no code yet. See `proposal.md` (Why) for the vision. The constraints that shape everything below come from FTM-1's "Decided" section:
+New project, no code yet. See `proposal.md` (Why) for the vision. The constraints that shape everything below come from MOOD-1's "Decided" section:
 
 - Everything runs locally at $0. Claude Code runs on the owner's subscription; no paid API.
 - One PC: Windows 11, RTX 3060 Ti with 8 GB VRAM, about 285 GB free on `C:`. Every model must fit in 8 GB, one large model loaded at a time.
@@ -26,43 +26,43 @@ No `okf/decisions/` or `okf/architecture/` files exist yet; phase 2 of this kick
 ## Overview
 
 ```
-inbox/ ──► ftm ingest ──────────────────────────────► library/ (LanceDB + keeper clips)
+inbox/ ──► mood ingest ──────────────────────────────► library/ (LanceDB + keeper clips)
              split ─► cheap pass ─► junk filter ─► expensive pass ─► export keepers
                        (SigLIP)                    (small VLM)
 
 Claude Code: "reel for [song] by [artist]"
-   1. ftm lyrics   ──► LRCLIB (or pasted LRC)            ─► timed lyrics + song duration
-   2. ftm audio    ──► yt-dlp (or owner's file), duration check ─► audio/<slug>.<ext> (local only)
-   3. ftm beats    ──► beat tracker                      ─► tempo, beats, downbeats
+   1. mood lyrics   ──► LRCLIB (or pasted LRC)            ─► timed lyrics + song duration
+   2. mood audio    ──► yt-dlp (or owner's file), duration check ─► audio/<slug>.<ext> (local only)
+   3. mood beats    ──► beat tracker                      ─► tempo, beats, downbeats
    4. Claude       ──► section (20–30 s, on a downbeat) + emotional arc of phases ─► reels/<slug>/plan.json
-   5. ftm search   ──► candidates per phase (+ contact sheet)
+   5. mood search   ──► candidates per phase (+ contact sheet)
       Claude       ──► shot sequence, every cut on a beat ─► plan.json updated
-   6. ftm render plan.json ──► reels/<slug>/reel.mp4 + note.txt
+   6. mood render plan.json ──► reels/<slug>/reel.mp4 + note.txt
 
-ftm review ──► local page ──► rejected flag in library
+mood review ──► local page ──► rejected flag in library
 ```
 
-### Modules (Python package `ftm`)
+### Modules (Python package `mood`)
 
 | Module | Job | Capability |
 |--------|-----|-----------|
-| `ftm.cli` | One command line `ftm` with sub-commands: `doctor`, `ingest`, `export`, `search`, `sheet`, `lyrics`, `audio`, `beats`, `render`, `review` | all |
-| `ftm.config` | Folder paths (inbox, library, reels, models cache) and settings, from one `ftm.toml` | all |
-| `ftm.ingest.split` | Shot boundaries per video | footage-ingest |
-| `ftm.ingest.cheap` | SigLIP embeddings, zero-shot tags, measured stats, junk filter | footage-ingest |
-| `ftm.ingest.describe` | Vision-language model pass on surviving shots | footage-ingest |
-| `ftm.library` | LanceDB access: the shot table, its schema and migrations; keeper clip export | footage-ingest, shot-search, shot-review |
-| `ftm.search` | Filters, ranking, consistency, candidate list, contact sheets | shot-search |
-| `ftm.lyrics` | LRCLIB client and LRC parser | reel-planning |
-| `ftm.audio` | Song audio (yt-dlp download or owner's file, duration check) and beat grid (tempo, beats, downbeats) | reel-planning |
-| `ftm.timing` | Cut planning: snaps cuts to beats, lyric hints, shot length per phase pace | reel-planning |
-| `ftm.render` | Reel plan → 9:16 video, grade, lyrics, note | reel-render |
-| `ftm.review` | Local review page | shot-review |
+| `mood.cli` | One command line `mood` with sub-commands: `doctor`, `ingest`, `export`, `search`, `sheet`, `lyrics`, `audio`, `beats`, `render`, `review` | all |
+| `mood.config` | Folder paths (inbox, library, reels, models cache) and settings, from one `mood.toml` | all |
+| `mood.ingest.split` | Shot boundaries per video | footage-ingest |
+| `mood.ingest.cheap` | SigLIP embeddings, zero-shot tags, measured stats, junk filter | footage-ingest |
+| `mood.ingest.describe` | Vision-language model pass on surviving shots | footage-ingest |
+| `mood.library` | LanceDB access: the shot table, its schema and migrations; keeper clip export | footage-ingest, shot-search, shot-review |
+| `mood.search` | Filters, ranking, consistency, candidate list, contact sheets | shot-search |
+| `mood.lyrics` | LRCLIB client and LRC parser | reel-planning |
+| `mood.audio` | Song audio (yt-dlp download or owner's file, duration check) and beat grid (tempo, beats, downbeats) | reel-planning |
+| `mood.timing` | Cut planning: snaps cuts to beats, lyric hints, shot length per phase pace | reel-planning |
+| `mood.render` | Reel plan → 9:16 video, grade, lyrics, note | reel-render |
+| `mood.review` | Local review page | shot-review |
 | `.claude/skills/reel/` | The "reel for [song] by [artist]" workflow for Claude Code: calls the CLI and does the director step | reel-planning |
 
 ### Commands (no network API)
 
-The system has no HTTP API. Its interface is the `ftm` CLI; each command prints JSON when `--json` is given, so Claude Code can read results. The only local web server is `ftm review` (bound to `127.0.0.1`).
+The system has no HTTP API. Its interface is the `mood` CLI; each command prints JSON when `--json` is given, so Claude Code can read results. The only local web server is `mood review` (bound to `127.0.0.1`).
 
 ### Connections
 
@@ -85,7 +85,7 @@ One: the owner's PC. Folders (configurable): `inbox/`, `library/` (LanceDB table
 ## Decisions
 
 ### D1. Claude Code is the orchestrator and the director; Python tools do the heavy work — Decision record needed
-The "reel for…" request is a Claude Code skill. Judgement steps (section choice, emotional arc, final shot pick) are done by Claude in the session, at no extra cost on the subscription. Deterministic and GPU steps are `ftm` CLI commands.
+The "reel for…" request is a Claude Code skill. Judgement steps (section choice, emotional arc, final shot pick) are done by Claude in the session, at no extra cost on the subscription. Deterministic and GPU steps are `mood` CLI commands.
 Alternatives: a local LLM for the director step (costs VRAM, weaker writing); the Claude API (paid, excluded by the brief).
 
 ### D2. Python 3.12 on Windows with PyTorch + CUDA, managed with uv — Decision record needed
@@ -97,21 +97,21 @@ Ingest runs in passes over a batch of shots: split → cheap pass (SigLIP) → j
 Alternative: one model server holding all models (does not fit 8 GB).
 
 ### D4. LanceDB, one row per shot, embeddings in the same table — Decision record needed
-Current choice in FTM-1. Embedded (no server), stores vectors next to metadata, supports filter-then-rank queries. Schema changes go through `ftm.library` with a `pipeline_version` column so old rows can be re-processed.
+Current choice in MOOD-1. Embedded (no server), stores vectors next to metadata, supports filter-then-rank queries. Schema changes go through `mood.library` with a `pipeline_version` column so old rows can be re-processed.
 Alternatives: SQLite + FAISS (two stores to keep in sync); Chroma (weaker columnar filters).
 
 ### D5. SigLIP for look embeddings and zero-shot tags — Decision record needed
-Current choice in FTM-1. One model gives both the look embedding and the zero-shot tags (emotion, content, shot type) by comparing a shot's frames with text prompts. Proposed checkpoint: `google/siglip-so400m-patch14-384` in fp16 (about 2 GB VRAM); the embedding of a shot is the mean of a few sampled frames. Search ranks with SigLIP text embeddings of the visual description, so the same model serves ingest and search.
+Current choice in MOOD-1. One model gives both the look embedding and the zero-shot tags (emotion, content, shot type) by comparing a shot's frames with text prompts. Proposed checkpoint: `google/siglip-so400m-patch14-384` in fp16 (about 2 GB VRAM); the embedding of a shot is the mean of a few sampled frames. Search ranks with SigLIP text embeddings of the visual description, so the same model serves ingest and search.
 Alternatives: CLIP ViT-L/14 (weaker on fine visual detail); SigLIP 2 (newer; can replace if a test set shows better results — embeddings would then be recomputed).
 
 ### D6. A fixed emotion list — Decision record needed
 Proposed (to confirm in review): `heartbreak`, `longing`, `tenderness`, `intimacy`, `joy`, `euphoria`, `nostalgia`, `loneliness`, `melancholy`, `hope`, `calm`, `tension`. Defined once in code; tagging, the VLM prompt and search all use it. Changing the list later means re-tagging.
 
 ### D7. Shot splitting: TransNetV2 on the GPU (proposed, confirmed in backlog ticket 2) — Decision record needed
-FTM-1 says splitting runs on the GPU and the tool is not chosen. TransNetV2 is a small neural cut detector (well under 1 GB VRAM) that handles fades and dissolves better than threshold methods. PySceneDetect `ContentDetector` is the fallback (CPU, simpler, fine for hard cuts).
+MOOD-1 says splitting runs on the GPU and the tool is not chosen. TransNetV2 is a small neural cut detector (well under 1 GB VRAM) that handles fades and dissolves better than threshold methods. PySceneDetect `ContentDetector` is the fallback (CPU, simpler, fine for hard cuts).
 
 ### D8. Vision-language model: a small Qwen-VL model, quantised if needed (proposed, confirmed in backlog ticket 6) — Decision record needed
-FTM-1 leaves it open. Requirements: fits under 8 GB alongside nothing else, follows a JSON output format, gives good short captions. Candidates to benchmark in ticket 6 on ~50 library shots: Qwen2.5-VL-3B-Instruct (fp16 or 8-bit), a 4-bit Qwen2.5-VL-7B, MiniCPM-V. Output is validated against the fixed emotion list (D6) and a JSON schema; invalid output is retried once, then the shot is marked for review.
+MOOD-1 leaves it open. Requirements: fits under 8 GB alongside nothing else, follows a JSON output format, gives good short captions. Candidates to benchmark in ticket 6 on ~50 library shots: Qwen2.5-VL-3B-Instruct (fp16 or 8-bit), a 4-bit Qwen2.5-VL-7B, MiniCPM-V. Output is validated against the fixed emotion list (D6) and a JSON schema; invalid output is retried once, then the shot is marked for review.
 
 ### D9. Rendering: FFmpeg filter graphs with ASS subtitles for lyrics (proposed, confirmed in backlog ticket 10) — Decision record needed
 FFmpeg (free, NVENC hardware encoding on the 3060 Ti) crops and scales each shot to 9:16, applies one shared grade (`lut3d` with a `.cube` LUT, plus `eq` for exposure), concatenates without audio, and burns lyrics from a generated ASS file (libass gives fonts, outlines, fades and per-word styling for the key-word emphasis).
@@ -123,11 +123,11 @@ Keeper shots are exported as short H.264 clips (720p wide side, high quality) un
 ### D11. Lyrics: LRCLIB first, pasted LRC as fallback
 LRCLIB's search by track and artist returns synced LRC. If none is found or the owner pastes lyrics, the same LRC parser is used. Key words per line are chosen by Claude in the director step and stored in the reel plan.
 
-### D12. Review page: local, served by `ftm review`
+### D12. Review page: local, served by `mood review`
 A small local page (FastAPI + plain HTML, bound to `127.0.0.1`) streams keeper clips with their caption and tags and a reject button. Rejection sets `rejected` on the shot row; search always filters `rejected = false`. Chosen in ticket 17; low cost to change.
 
 ### D13. Song audio from YouTube with yt-dlp, owner's file as override — Decision record needed
-Chosen by the owner in review. `ftm audio` searches YouTube for "[song] [artist]" (preferring official audio uploads), downloads the audio only, and checks its duration against LRCLIB's (more than 2 s apart: stop and ask). An audio file given by the owner skips the download. Audio is used only to find beats; it stays in `audio/` (git-ignored) and is never in the export.
+Chosen by the owner in review. `mood audio` searches YouTube for "[song] [artist]" (preferring official audio uploads), downloads the audio only, and checks its duration against LRCLIB's (more than 2 s apart: stop and ask). An audio file given by the owner skips the download. Audio is used only to find beats; it stays in `audio/` (git-ignored) and is never in the export.
 Alternatives: owner-provided files only (no terms-of-service issue, one manual step per song); Spotify's audio-analysis API (closed to new apps since late 2024).
 
 ### D14. Beat tracking: Beat This! (proposed, confirmed in backlog ticket 15) — Decision record needed
@@ -143,15 +143,15 @@ Alternative: cut on lyric lines (the original plan), which lags visibly behind t
 - [Zero-shot emotion tags are noisy] → tags only filter broadly; the VLM emotion and Claude's final read of captions decide; review rejections remove the worst.
 - [Lyrics drift if the Instagram start time is not exact] → note the start to 0.1 s; open question 3 may make the section start snap to whole seconds.
 - [Copyright takedowns from film footage] → open question 1; record source and licence per shot so risky shots can be filtered out later.
-- [Windows wheels for CUDA libraries] → Python 3.12 and `uv`; `ftm doctor` checks the CUDA build, the GPU and FFmpeg before anything else.
-- [yt-dlp breaks when YouTube changes, or finds the wrong version] → keep yt-dlp updated (`ftm doctor` reports its version); the duration check (D13) catches most wrong versions; the owner's file is always an option.
+- [Windows wheels for CUDA libraries] → Python 3.12 and `uv`; `mood doctor` checks the CUDA build, the GPU and FFmpeg before anything else.
+- [yt-dlp breaks when YouTube changes, or finds the wrong version] → keep yt-dlp updated (`mood doctor` reports its version); the duration check (D13) catches most wrong versions; the owner's file is always an option.
 - [LRC timings and the downloaded audio come from different recordings] → duration check; open question 7 on aligning the first line.
 - [Beat tracker wrong on rubato or half-time songs] → benchmark in ticket 15; the plan shows the tempo for a quick sanity check; fallback to lyric line starts.
 - [Long ingest of full films] → resumable passes (D3); ingest can stop and resume.
 
 ## Migration Plan
 
-None: new project. Library schema changes later go through `ftm.library` and `pipeline_version` (D4).
+None: new project. Library schema changes later go through `mood.library` and `pipeline_version` (D4).
 
 ## Open Questions
 
