@@ -1,20 +1,19 @@
-# Spec Delta
+# reel-planning Specification
 
 ## Purpose
-
 Takes a song request made in Claude Code and turns it into a planned reel: the song's lyrics, audio, beat grid and word timings, the 20–30 second section the owner sets, an emotional arc of phases, and the sequence of shots, cut on the beat, that will be rendered. Every time in the plan is song time (seconds from the start of the recording), the same clock as Instagram's audio start.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Start from a song request
-The workflow SHALL start when the owner asks Claude Code for "reel for [song] by [artist]" and SHALL end with a rendered reel without any manual editing.
+The workflow SHALL start when the owner asks Claude Code for "reel for [song] by [artist]" and SHALL end with a rendered reel without any manual editing. Knowledge: `okf/domain/reel.md`, `okf/decisions/001-claude-code-orchestrates-local-tools.md`
 
 #### Scenario: Request to reel
 - **WHEN** the owner asks for "reel for [song] by [artist]"
 - **THEN** the workflow asks for the section times if they were not given, and runs through lyrics, audio, beats, word timings, section, arc, shot selection and render, and gives the reel and its start-time note
 
 ### Requirement: Song lyrics
-The workflow SHALL get the song's lyrics and the recording's duration from LRCLIB, or use lyrics pasted by the owner.
+The workflow SHALL get the song's lyrics and the recording's duration from LRCLIB, or use lyrics pasted by the owner. Knowledge: `okf/integrations/lrclib.md`
 
 #### Scenario: Lyrics from LRCLIB
 - **WHEN** LRCLIB has the song
@@ -29,7 +28,7 @@ The workflow SHALL get the song's lyrics and the recording's duration from LRCLI
 - **THEN** the workflow asks the owner to paste the lyrics
 
 ### Requirement: Song audio
-The workflow SHALL get the song's audio by downloading it with yt-dlp from the song and artist, or use an audio file given by the owner. The audio is used only for analysis: it stays local and is never part of the exported reel. Its duration SHALL be checked against the recording's duration, so all timings come from the same recording Instagram plays and not a live version, remix or edit. Knowledge: `okf/integrations/youtube-audio.md`
+The workflow SHALL get the song's audio by downloading it with yt-dlp from the song and artist, or use an audio file given by the owner. The audio is used only for analysis: it stays local and is never part of the exported reel. Its duration SHALL be checked against the recording's duration, so all timings come from the same recording Instagram plays and not a live version, remix or edit. Knowledge: `okf/integrations/youtube-audio.md`, `okf/decisions/008-song-audio-from-youtube.md`
 
 #### Scenario: Audio downloaded
 - **WHEN** no audio file is given for the song
@@ -104,7 +103,7 @@ The workflow SHALL write an emotional arc for the section: a few phases, each wi
 - **THEN** every lyric line in the section has one meaningful word
 
 ### Requirement: Shot selection
-The workflow SHALL search the moment library for each phase and pick a sequence of shots that fills the section and flows well, without reusing a shot in the same reel.
+The workflow SHALL search the moment library for each phase and pick a sequence of shots that fills the section and flows well, without reusing a shot in the same reel. Knowledge: `okf/data/reel-plan.md`
 
 #### Scenario: Section filled
 - **WHEN** shots are selected
@@ -119,7 +118,7 @@ The workflow SHALL search the moment library for each phase and pick a sequence 
 - **THEN** the shot's usable length in the library is at least that long, so it is never frozen or looped
 
 ### Requirement: Cuts on the beat
-The reel's first shot SHALL start at the section start. Every later cut SHALL fall on a beat, so scene changes never lag behind the music. Cuts are placed, in order of preference: on the first beat after a lyric line ends; on the beat closest to the start of a line's meaningful word; on another beat when needed to keep shots within their usable length or the phase's pace. Calm phases hold shots for more beats than intense phases. Knowledge: `okf/domain/beat-grid.md`
+The reel's first shot SHALL start at the section start, and every later cut SHALL fall on a beat, preferably the first beat after a lyric line ends, else the beat closest to a line's meaningful word. Calm phases hold shots for more beats than intense ones. Knowledge: `okf/domain/beat-grid.md`, `okf/decisions/009-cuts-on-the-beat.md`
 
 #### Scenario: Cut on a beat
 - **WHEN** the shot sequence is planned

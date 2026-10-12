@@ -4,15 +4,16 @@
      Put knowledge in okf/ and behaviour in openspec/, and point to them. TODO lines are filled by /dirox-kit:kickoff. -->
 
 ## Project
-- What it is: TODO one sentence
-- Stack: TODO language, framework, database, hosting (with versions)
+- What it is: local tools that turn indie love songs into silent, cinematic 9:16 Instagram reels, with shots matched to the song's feeling and cut on the beat; Claude Code drives them (`okf/architecture/overview.md`).
+- Stack: Python 3.12 with uv, PyTorch (CUDA), LanceDB, SigLIP, FFmpeg, yt-dlp; runs only on the owner's Windows 11 PC with an RTX 3060 Ti (8 GB). No hosting, no server (`okf/architecture/tech-stack.md`).
 - Jira project key: MOOD
 
 ## Commands
-- Install: TODO
-- Run locally: TODO
-- Test: TODO
-- Lint / format: TODO
+Planned; the project-skeleton ticket creates them. Until then there is no code to run.
+- Install: `uv sync`
+- Run locally: `uv run mood <command>` (`mood doctor` first: GPU, CUDA, FFmpeg, yt-dlp)
+- Test: `uv run pytest` (CPU only, no network)
+- Lint / format: `uv run ruff check .` and `uv run ruff format .`
 
 ## Where things are
 - `openspec/`: what the system must do. `specs/<capability>/spec.md` is the current behaviour (requirements and scenarios); `changes/<change>/` is work in progress (proposal, design, tasks, spec deltas); `changes/archive/` is done work. Managed by OpenSpec: `openspec list`, `openspec show <name>`.
@@ -40,4 +41,10 @@
 - Keep changes small and inside the change's tasks. Ask before refactoring anything else.
 
 ## Project rules
-- TODO naming, folder conventions, things never to touch
+- Package `mood`, CLI `mood`, config `mood.toml`. Every CLI command supports `--json` so Claude can read its output.
+- Never commit the working folders: `inbox/`, `processed/`, `library/`, `audio/`, `reels/`, `models/` (git-ignored). Never commit media or song audio.
+- One large GPU model at a time, within 8 GB VRAM; free it before loading the next (`okf/decisions/003-one-gpu-model-at-a-time.md`).
+- No paid APIs or cloud services; everything runs locally at $0.
+- Every time in a reel plan is song time; cuts after the first shot always land on a beat (`okf/decisions/009-cuts-on-the-beat.md`). The owner's section times are never moved.
+- Emotions come only from the fixed list (`okf/decisions/006-fixed-emotion-list.md`); adding one bumps `pipeline_version`.
+- Tests never need a GPU or network: tiny fixtures and fake models.
