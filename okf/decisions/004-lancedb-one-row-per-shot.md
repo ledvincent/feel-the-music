@@ -8,7 +8,7 @@ tags: [decision]
 ---
 # LanceDB, one row per shot
 
-Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/2026-10-12-mood-1-kickoff/`
+Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/mood-1-kickoff-2026-10-12/`
 
 ## Context
 Search filters on metadata (emotion, content, not rejected) and then ranks by embedding similarity. The library grows over time and gains columns ticket by ticket.

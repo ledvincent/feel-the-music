@@ -8,7 +8,7 @@ tags: [decision]
 ---
 # Keeper clips as the long-term library
 
-Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/2026-10-12-mood-1-kickoff/`
+Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/mood-1-kickoff-2026-10-12/`
 
 ## Context
 Source films are large; the library must stay around 5 to 15 GB on the owner's disk.

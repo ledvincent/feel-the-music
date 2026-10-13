@@ -8,7 +8,7 @@ tags: [decision]
 ---
 # Python 3.12 with uv on Windows and CUDA
 
-Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/2026-10-12-mood-1-kickoff/`
+Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/mood-1-kickoff-2026-10-12/`
 
 ## Context
 Moodcut runs on a Windows 11 PC with an RTX 3060 Ti. Most ML packages (PyTorch, transformers, LanceDB, PyAV) publish Windows wheels for Python 3.12 first; newer Pythons lag for some CUDA libraries.

@@ -8,7 +8,7 @@ tags: [decision]
 ---
 # SigLIP for look embeddings and zero-shot tags
 
-Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/2026-10-12-mood-1-kickoff/`
+Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/mood-1-kickoff-2026-10-12/`
 
 ## Context
 Every shot needs a cheap description of its look and rough tags, and search must compare text with images.

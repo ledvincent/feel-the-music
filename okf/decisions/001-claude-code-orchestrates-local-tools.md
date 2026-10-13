@@ -8,7 +8,7 @@ tags: [decision]
 ---
 # Claude Code orchestrates local tools
 
-Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/2026-10-12-mood-1-kickoff/`
+Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/mood-1-kickoff-2026-10-12/`
 
 ## Context
 Making a reel needs taste (the emotional arc, which word of a line matters, which shot flows into which) and heavy computation (video analysis, search, rendering). The brief requires $0: Claude Code runs on the owner's subscription, with no paid API.

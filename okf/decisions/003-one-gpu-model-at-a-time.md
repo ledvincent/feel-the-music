@@ -8,7 +8,7 @@ tags: [decision]
 ---
 # One large GPU model at a time, pass by pass
 
-Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/2026-10-12-mood-1-kickoff/`
+Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/mood-1-kickoff-2026-10-12/`
 
 ## Context
 The GPU has 8 GB of VRAM. SigLIP, the vision-language model, the shot splitter, the beat tracker and the word aligner do not fit together.
