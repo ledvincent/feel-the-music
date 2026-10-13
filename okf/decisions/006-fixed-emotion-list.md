@@ -8,7 +8,7 @@ tags: [decision]
 ---
 # A fixed emotion list
 
-Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/2026-10-12-mood-1-kickoff/`
+Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/mood-1-kickoff-2026-10-12/`
 
 ## Context
 Tagging, captioning and search must speak the same words, or a heartbroken section could match a shot tagged with a synonym.

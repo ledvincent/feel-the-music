@@ -8,7 +8,7 @@ tags: [decision]
 ---
 # Cuts on beats, placed by the lyrics
 
-Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/2026-10-12-mood-1-kickoff/`
+Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/mood-1-kickoff-2026-10-12/`
 
 ## Context
 Cutting on lyric lines lags visibly behind the music, because sung lines rarely start on the beat. The owner also sets the section, and its times must not move.

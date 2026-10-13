@@ -8,7 +8,7 @@ tags: [decision]
 ---
 # Song audio from YouTube with yt-dlp
 
-Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/2026-10-12-mood-1-kickoff/`
+Date: 2026-10-12 · Jira: MOOD-1 · Change: `openspec/changes/archive/mood-1-kickoff-2026-10-12/`
 
 ## Context
 Beats and word timings need the song's audio, but the reel is silent and the music is added in Instagram. Spotify's audio-analysis API is closed to new apps.
