@@ -2,7 +2,7 @@
 
 ## Context
 
-No code exists yet (see proposal.md, Why). The kickoff design fixed the module layout (`mood.cli`, `mood.config`, …) and the rule that the CLI is the only interface, with `--json` for Claude Code (`openspec/changes/archive/2026-10-12-mood-1-kickoff/design.md`). This design follows `okf/architecture/tech-stack.md`, `okf/decisions/001-claude-code-orchestrates-local-tools.md`, `okf/decisions/002-python-312-uv-windows-cuda.md` and `okf/decisions/003-one-gpu-model-at-a-time.md`.
+No code exists yet (see proposal.md, Why). The kickoff design fixed the module layout (`mood.cli`, `mood.config`, …) and the rule that the CLI is the only interface, with `--json` for Claude Code (`openspec/changes/archive/mood-1-kickoff-2026-10-12/design.md`). This design follows `okf/architecture/tech-stack.md`, `okf/decisions/001-claude-code-orchestrates-local-tools.md`, `okf/decisions/002-python-312-uv-windows-cuda.md` and `okf/decisions/003-one-gpu-model-at-a-time.md`.
 
 Code is written on a laptop without CUDA (Intel Arc) and run on the RTX 3060 Ti PC. Tests must pass on both, on CPU, with no network.
 

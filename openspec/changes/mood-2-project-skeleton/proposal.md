@@ -38,6 +38,32 @@ None.
 - Dependencies: PyTorch (CUDA index), a CLI library, yt-dlp, pytest, ruff. FFmpeg is an external program found on `PATH`.
 - Knowledge: `okf/architecture/tech-stack.md`, `okf/decisions/002-python-312-uv-windows-cuda.md`, `okf/decisions/003-one-gpu-model-at-a-time.md`.
 
+## Criteria coverage
+
+| Acceptance criterion | Source | Scenario |
+|---|---|---|
+| WHEN any `mood` command runs with `--json` THEN its stdout parses as one JSON document | Jira MOOD-2 (ticket description) | Every command accepts json |
+| WHEN `mood --json doctor` and `mood doctor --json` run THEN both succeed with the same JSON | Jira MOOD-2 (proposal review) | Json flag in either position |
+| WHEN `mood --json` gets an unknown command THEN one JSON error and a non-zero exit | Jira MOOD-2 (sizing, 2026-10-13) | Unknown command in JSON mode |
+| WHEN there is no `mood.toml` THEN each folder is its default under the project root | Jira MOOD-2 (sizing, 2026-10-13) | Missing config uses defaults |
+| WHEN `mood.toml` sets only the inbox THEN the other folders keep their defaults | Jira MOOD-2 (sizing, 2026-10-13) | Config overrides a folder |
+| WHEN `mood.toml` is invalid or has an unknown setting THEN the command stops, names the file and the problem, exits non-zero | Jira MOOD-2 (sizing, 2026-10-13) | Invalid config is reported |
+| WHEN every doctor check passes THEN GPU, VRAM, PyTorch/CUDA, FFmpeg and yt-dlp are listed ok and exit 0 | Jira MOOD-2 (ticket description); `okf/decisions/002-python-312-uv-windows-cuda.md` | Healthy machine |
+| WHEN VRAM is under 8 GB THEN the VRAM check is a warning and exit 0 | Jira MOOD-2 (proposal review); `okf/decisions/003-one-gpu-model-at-a-time.md` | Low VRAM is a warning |
+| WHEN PyTorch has no CUDA or sees no GPU THEN the PyTorch check fails with the matching hint | Jira MOOD-2 (sizing, 2026-10-13) | CPU-only PyTorch fails the check |
+| WHEN doctor runs THEN it lists the working folders and whether each exists | Jira MOOD-2 (sizing, 2026-10-13) | Doctor shows the folders |
+| WHEN FFmpeg and yt-dlp are both missing THEN both fail with their own hint and the other checks still run | Jira MOOD-2 (sizing, 2026-10-13) | Doctor reports every failure |
+| WHEN any check fails THEN doctor exits non-zero, also with `--json` | Jira MOOD-2 (sizing, 2026-10-13) | Doctor exit code |
+
+Considered, not needed:
+- pytest and ruff set up: tooling, not behaviour; tasks 1.1 and 1.3 cover them.
+- Doctor creating missing folders: doctor only reports; folders are created by the commands that write to them (later tickets).
+- A minimum NVIDIA driver version: doctor shows the driver next to the CUDA version; a fixed minimum would go stale with each PyTorch update.
+- Checking that YouTube is reachable: doctor stays offline; download problems are reported by `mood audio` (MOOD-15).
+- Checking models in `models/`: no model is used yet; each model's ticket checks its own files.
+
+Open questions: none.
+
 ## Jira acceptance criteria
 
 Read from MOOD-2 on 2026-10-13 15:03

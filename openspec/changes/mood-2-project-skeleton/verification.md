@@ -1,33 +1,32 @@
-Verified: 2026-10-13 at 98db361 (uncommitted changes)
+Verified: 2026-10-14 at 5287ee9
 
-Tests: uv run pytest → 21/21 passed (0 failed, 0 skipped). Also ran `uv run ruff check .` (All checks passed) and `uv run ruff format --check .` (77 files already formatted).
+Tests: uv run pytest → 21/21 passed (0 failed, 0 skipped)
 OpenSpec: `openspec validate mood-2-project-skeleton --strict` → "Change 'mood-2-project-skeleton' is valid"
 
 | Requirement | Scenario | Proven by | OK? | Note |
 |---|---|---|---|---|
-| JSON output on every command | Every command accepts json | tests/test_cli.py::test_every_command_accepts_json[doctor] (5.1) | Yes | Parametrised over registered commands; asserts the shared `--json` option is declared and stdout parses as one JSON document. Only `doctor` exists today. |
-| JSON output on every command | Json flag in either position | tests/test_cli.py::test_json_flag_in_either_position (5.2) | Yes | Asserts both orders exit 0 and parse to equal JSON. |
-| JSON output on every command | Unknown command in JSON mode | tests/test_cli.py::test_unknown_command_in_json_mode (5.3) | Yes | Asserts `ok` false, error names the command, non-zero exit. |
-| Working folders from mood.toml | Missing config uses defaults | tests/test_config.py::test_missing_config_uses_defaults (5.4) | Yes | |
-| Working folders from mood.toml | Config overrides a folder | tests/test_config.py::test_config_overrides_a_folder (5.5) | Yes | Absolute path; an extra test covers a relative path. |
-| Working folders from mood.toml | Invalid config is reported | tests/test_config.py::test_invalid_config_is_reported (5.6) + `..._by_the_command` | Yes | Bad TOML, unknown folder key, unknown table; message names the file; command-level test asserts JSON error and non-zero exit. |
-| Doctor checks the machine | Healthy machine | tests/test_doctor.py::test_healthy_machine (5.7) | Yes | Fake probes; asserts GPU name, VRAM, PyTorch+CUDA versions, FFmpeg, yt-dlp all ok, exit 0. Real hardware is task 4.2 (manual, not done). |
-| Doctor checks the machine | Low VRAM is a warning | tests/test_doctor.py::test_low_vram_is_a_warning (5.8) | Yes | Parametrised 6144 and 7782 MiB; the code compares `vram_mib < 8*1024`, so the 7.5–7.99 GB edge is handled. Asserts warning, amount shown, exit 0. |
-| Doctor checks the machine | CPU-only PyTorch fails the check | tests/test_doctor.py::test_cpu_only_pytorch_fails_the_check (5.9) | Yes | Both cases: CPU-only build gets the "CUDA build" hint, CUDA build with no GPU gets the "driver" hint, matching the updated scenario. Calls `run_doctor` directly. |
-| Doctor checks the machine | Doctor shows the folders | tests/test_doctor.py::test_doctor_shows_the_folders (5.10) | Yes | All 6 folders, existence and path asserted. |
-| Doctor reports every failure | Doctor reports every failure | tests/test_doctor.py::test_doctor_reports_every_failure (5.11) | Yes | Two distinct fix hints; GPU and PyTorch still run. Extra test covers a crashing probe. |
-| Doctor reports every failure | Doctor exit code | tests/test_doctor.py::test_doctor_exit_code (5.12) | Yes | Non-zero with and without `--json`. |
+| JSON output on every command | Every command accepts json | tests/test_cli.py::test_every_command_accepts_json[doctor] (5.1) | Yes | Runs over every registered command. Checks the shared `--json` option is declared and that stdout parses as one JSON document. `doctor` is the only command today. |
+| JSON output on every command | Json flag in either position | tests/test_cli.py::test_json_flag_in_either_position (5.2) | Yes | Both orders exit 0 and give the same parsed JSON. |
+| JSON output on every command | Unknown command in JSON mode | tests/test_cli.py::test_unknown_command_in_json_mode (5.3) | Yes | Asserts `ok` is false, the error names the command, and the exit code is non-zero. |
+| Working folders from mood.toml | Missing config uses defaults | tests/test_config.py::test_missing_config_uses_defaults (5.4) | Yes | All 6 folders are `<root>/<name>`. |
+| Working folders from mood.toml | Config overrides a folder | tests/test_config.py::test_config_overrides_a_folder (5.5) | Yes | Absolute inbox path; the other folders keep their defaults. An extra test covers a relative path. |
+| Working folders from mood.toml | Invalid config is reported | tests/test_config.py::test_invalid_config_is_reported (5.6), plus `..._by_the_command` | Yes | Covers bad TOML, an unknown folder key and an unknown table. The message names the file and the problem. The command-level test checks the JSON error and the non-zero exit. |
+| Doctor checks the machine | Healthy machine | tests/test_doctor.py::test_healthy_machine (5.7) | Yes | Uses fake probes. Asserts the GPU name, 8.0 GB VRAM, PyTorch and CUDA versions, FFmpeg and yt-dlp, all ok, exit 0. Task 4.2 covers the real hardware: ticked, output said to be in PR #9 (not checked here). |
+| Doctor checks the machine | Low VRAM is a warning | tests/test_doctor.py::test_low_vram_is_a_warning (5.8) | Yes | Runs with 6144 and 7782 MiB. Asserts warning status, the amount shown and exit 0. |
+| Doctor checks the machine | CPU-only PyTorch fails the check | tests/test_doctor.py::test_cpu_only_pytorch_fails_the_check (5.9) | Yes | CPU-only build: failed with the "CUDA build" hint. CUDA build with no GPU: failed with the "driver" hint. Calls `run_doctor` directly, not through the CLI. |
+| Doctor checks the machine | Doctor shows the folders | tests/test_doctor.py::test_doctor_shows_the_folders (5.10) | Yes | All 6 folders listed, with existence and path asserted. |
+| Doctor reports every failure | Doctor reports every failure | tests/test_doctor.py::test_doctor_reports_every_failure (5.11) | Yes | Both failed, with two different hints; the GPU and PyTorch checks still run and pass. An extra test covers a probe that crashes. |
+| Doctor reports every failure | Doctor exit code | tests/test_doctor.py::test_doctor_exit_code (5.12) | Yes | Non-zero exit with and without `--json`; JSON `ok` is false. |
 
-Scope: matches the tasks. Changed files: pyproject.toml, uv.lock, src/mood/{__init__,cli,config,doctor}.py, tests/{__init__,conftest,test_cli,test_config,test_doctor,test_smoke}.py, mood.example.toml, .gitignore, .claude/CLAUDE.md (task 4.3), and the change artifacts. No unplanned code files. Unticked task: 4.2 (manual `mood doctor` / `mood doctor --json` / `mood --json doctor` on the RTX 3060 Ti PC, output pasted in the PR). All work is uncommitted.
+Scope: in line with the tasks. The local `main` ref is out of date: it points at 60ee3d3, so `git diff main...HEAD` also lists files from PRs #4–#8 that are already merged. Against `origin/main` (4271474) the diff is only what was planned: pyproject.toml, uv.lock, src/mood/{__init__,cli,config,doctor}.py, tests/{__init__,conftest,test_cli,test_config,test_doctor,test_smoke}.py, mood.example.toml, .gitignore, .claude/CLAUDE.md (task 4.3) and the change files. There are no extra files, no planned work left undone and no unticked tasks. The working tree is clean.
 
 Blocking findings:
-- none. Task 4.2 remains before merge: no test can prove the real GPU, CUDA, FFmpeg and yt-dlp on the owner's PC.
+- none
 
 Non-blocking findings:
-- proposal.md has no "## Criteria coverage" section, which kit 1.7.2's openspec/config.yaml asks for; strict validate passes.
-- The "## Jira acceptance criteria" snapshot changed in the working tree (13:54 → 15:03, PyTorch criterion reworded). Confirm it came from a sync and Jira holds the new wording.
-  (Recorder's note: it did. MOOD-2's criterion was updated in Jira at 15:03 with the owner's approval, then the snapshot was refreshed to match.)
-- The previous verification.md was stale (20/20 and the VRAM rounding finding); this file replaces it.
-- `main()` decides JSON mode for errors by `"--json" in args`, so a literal `--json` option value would also turn it on. Harmless today; worth knowing for later commands.
-- Design D2 asks for a decision record for the CLI library (Typer); D6 one if the CUDA version changes. They belong in okf/decisions/ at close-change.
-- No secrets, debug leftovers, skipped/xfail tests or new TODOs. pyproject.toml matches D1, D6, D7, D8.
+- openspec/changes/mood-2-project-skeleton/verification.md is out of date. It calls task 4.2 unticked, but tasks.md has it ticked (commit 5287ee9). It also says "All work is uncommitted", and the work is now committed. Refresh it, or let close-change replace it.
+- openspec/changes/mood-2-project-skeleton/proposal.md has no "## Criteria coverage" section, which openspec/config.yaml (line 16) asks for. Strict validate still passes.
+- Design D2 says the CLI library (Typer) needs a decision record. No file for it exists yet in okf/decisions/; it should be added at close-change.
+- src/mood/cli.py `main()` turns on JSON error output whenever `"--json" in args`. A literal `--json` given as the value of another option would also turn it on. This is harmless with today's single command.
+- src/mood/doctor.py `_safely("gpu", ...)` returns a single failed "gpu" entry when the GPU probe crashes, so the "vram" check is missing from the output in that case. This is minor; the other checks still run.
+- No secrets, debug leftovers, skipped or xfail tests, or new TODOs were found in the diff. pyproject.toml matches D1, D6, D7 and D8.
