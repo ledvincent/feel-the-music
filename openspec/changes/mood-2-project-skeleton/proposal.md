@@ -40,7 +40,7 @@ None.
 
 ## Jira acceptance criteria
 
-Read from MOOD-2 on 2026-10-13 13:54
+Read from MOOD-2 on 2026-10-13 15:03
 
 - WHEN any mood command runs with --json THEN its standard output parses as one JSON document
 - WHEN `mood --json doctor` and `mood doctor --json` run on the same machine THEN both succeed and print the same JSON document
@@ -50,7 +50,7 @@ Read from MOOD-2 on 2026-10-13 13:54
 - WHEN mood.toml is not valid TOML or names an unknown setting THEN the command stops with a message naming the file and the problem, and exits non-zero
 - WHEN mood doctor runs on a machine where every check passes THEN it lists the GPU name and VRAM, the PyTorch and CUDA versions, the FFmpeg version and the yt-dlp version, each marked ok, and exits 0
 - WHEN the GPU has less than 8 GB of VRAM and every other check passes THEN the VRAM check is marked warning with the amount found, and mood doctor exits 0
-- WHEN the installed PyTorch has no CUDA support or sees no GPU THEN the PyTorch check is marked failed with a hint to install the CUDA build
+- WHEN the installed PyTorch has no CUDA support or sees no GPU THEN the PyTorch check is marked failed, with a hint to install the CUDA build when PyTorch has no CUDA support, or to check the NVIDIA driver when the CUDA build sees no GPU
 - WHEN mood doctor runs THEN it lists the working folders in use and whether each exists
 - WHEN FFmpeg and yt-dlp are both missing THEN both checks are marked failed, each with its own fix hint, and the other checks still run
 - WHEN at least one check fails THEN mood doctor exits with a non-zero code, also with --json

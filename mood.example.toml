@@ -1,0 +1,13 @@
+# Moodcut configuration. Copy this file to mood.toml (git-ignored) and change what you need.
+# Every setting is optional: a missing one uses the folder of the same name in the project root.
+# Relative paths start from the project root; absolute paths are used as they are.
+
+[folders]
+# inbox = "inbox"            # video files waiting to be ingested
+# processed = "processed"    # source files already ingested
+# library = "library"        # LanceDB tables and keeper clips
+# audio = "audio"            # song audio, for analysis only
+# reels = "reels"            # reel plans and rendered reels
+# models = "models"          # downloaded models (Hugging Face cache)
+# Example: keep the big folders on another drive
+# library = "D:/moodcut/library"
