@@ -31,22 +31,26 @@ There is no code yet. Every later ticket (shot splitting, search, rendering) nee
 ### Modified Capabilities
 None.
 
-## Not in Jira yet
-
-The ticket has no acceptance criteria list; its description was read as the criteria. `Every command accepts json` and `Healthy machine` cover it. The other scenarios add behaviour decided while sizing on 2026-10-13; the ticket owner adds them to MOOD-2 before approving:
-- `Json flag in either position`: `mood --json doctor` and `mood doctor --json` both work.
-- `Unknown command in JSON mode`: errors are JSON too when `--json` is given.
-- `Low VRAM is a warning`: under 8 GB is a warning and doctor still exits 0.
-- `Missing config uses defaults`, `Config overrides a folder`, `Invalid config is reported`: `mood.toml` is optional and only overrides.
-- `CPU-only PyTorch fails the check`: for example on the planning laptop (Intel Arc, no CUDA).
-- `Doctor shows the folders`: doctor lists the working folders in use.
-- `Doctor reports every failure`, `Doctor exit code`: every check runs, each failure has a fix hint, the exit code is non-zero.
-
-pytest and ruff (in the description) are tooling, not behaviour: tasks set them up, and no scenario covers them.
-
 ## Impact
 
 - New: `pyproject.toml`, `uv.lock`, `src/mood/`, `tests/`, a commented `mood.example.toml`.
 - Changed: `.gitignore`.
 - Dependencies: PyTorch (CUDA index), a CLI library, yt-dlp, pytest, ruff. FFmpeg is an external program found on `PATH`.
 - Knowledge: `okf/architecture/tech-stack.md`, `okf/decisions/002-python-312-uv-windows-cuda.md`, `okf/decisions/003-one-gpu-model-at-a-time.md`.
+
+## Jira acceptance criteria
+
+Read from MOOD-2 on 2026-10-13 13:54
+
+- WHEN any mood command runs with --json THEN its standard output parses as one JSON document
+- WHEN `mood --json doctor` and `mood doctor --json` run on the same machine THEN both succeed and print the same JSON document
+- WHEN `mood --json` is given a command that does not exist THEN it prints one JSON document with an error message and exits non-zero
+- WHEN there is no mood.toml THEN each working folder is the folder of the same name under the project root
+- WHEN mood.toml sets only the inbox folder THEN the inbox is that path and the other folders keep their defaults
+- WHEN mood.toml is not valid TOML or names an unknown setting THEN the command stops with a message naming the file and the problem, and exits non-zero
+- WHEN mood doctor runs on a machine where every check passes THEN it lists the GPU name and VRAM, the PyTorch and CUDA versions, the FFmpeg version and the yt-dlp version, each marked ok, and exits 0
+- WHEN the GPU has less than 8 GB of VRAM and every other check passes THEN the VRAM check is marked warning with the amount found, and mood doctor exits 0
+- WHEN the installed PyTorch has no CUDA support or sees no GPU THEN the PyTorch check is marked failed with a hint to install the CUDA build
+- WHEN mood doctor runs THEN it lists the working folders in use and whether each exists
+- WHEN FFmpeg and yt-dlp are both missing THEN both checks are marked failed, each with its own fix hint, and the other checks still run
+- WHEN at least one check fails THEN mood doctor exits with a non-zero code, also with --json
