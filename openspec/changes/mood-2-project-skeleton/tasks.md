@@ -19,7 +19,7 @@
 ## 4. mood doctor
 
 - [x] 4.1 Create `mood.doctor` with independent checks for GPU and VRAM, PyTorch CUDA, FFmpeg, yt-dlp and folders, injectable probes, ok/warning/failed status (VRAM below 8 GB is a warning), a fix hint per failure and a non-zero exit on any failure (design D5); verify with the tests in group 5
-- [ ] 4.2 Run `uv run mood doctor`, `uv run mood doctor --json` and `uv run mood --json doctor` on the RTX 3060 Ti PC and verify every check is ok (manual; paste the output in the PR)
+- [x] 4.2 Run `uv run mood doctor`, `uv run mood doctor --json` and `uv run mood --json doctor` on the RTX 3060 Ti PC and verify every check is ok (manual; paste the output in the PR)
 - [x] 4.3 Update the Commands section of `CLAUDE.md` (remove "Planned") and verify each listed command runs as written
 
 ## 5. Proof
