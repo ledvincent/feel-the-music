@@ -13,6 +13,7 @@ rules:
     - 'Start the file with two lines before the first heading: "Jira: <KEY-123>" and "Size: normal" or "Size: big" (the size the person confirmed).'
     - State what is out of scope.
     - 'If a scenario is not an acceptance criterion in the Jira ticket, list it under a "Not in Jira yet" heading; the ticket owner adds it to Jira before approving.'
+    - 'End with a "## Jira acceptance criteria" section: first line "Read from <KEY-123> on <YYYY-MM-DD HH:MM>", then the ticket''s acceptance criteria exactly as they are in Jira, one per line ("None in Jira" if there are none). It is the snapshot /dirox-kit:jira sync compares Jira with; do not edit it by hand.'
   specs:
     - Every acceptance criterion in the Jira ticket becomes at least one scenario, keeping its meaning; reword only to make it testable.
     - 'When a requirement relies on a domain term, decision, data entity or integration, end its description with "Knowledge: `okf/<folder>/<file>.md`" instead of restating it.'
