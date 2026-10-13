@@ -1,5 +1,8 @@
 # Knowledge log
 
+## 2026-10-14
+* **Updated**: [Tech stack](/architecture/tech-stack.md) - Typer for the CLI and the CUDA 12.4 PyTorch index, chosen in MOOD-2
+
 ## 2026-10-13
 * **Added**: [Jira](/integrations/jira.md) - how the MOOD project's Jira is set up, from /dirox-kit:jira setup
 
