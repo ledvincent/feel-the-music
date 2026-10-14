@@ -9,9 +9,9 @@
 - Jira project key: MOOD
 
 ## Commands
-Planned; the project-skeleton ticket creates them. Until then there is no code to run.
-- Install: `uv sync`
-- Run locally: `uv run mood <command>` (`mood doctor` first: GPU, CUDA, FFmpeg, yt-dlp)
+- Install: `uv sync` (Python 3.12 and the CUDA build of PyTorch, from `uv.lock`)
+- Run locally: `uv run mood <command>`; add `--json` for Claude. `uv run mood doctor` first: GPU, CUDA, FFmpeg, yt-dlp, folders
+- Config: optional `mood.toml` (git-ignored), see `mood.example.toml`
 - Test: `uv run pytest` (CPU only, no network)
 - Lint / format: `uv run ruff check .` and `uv run ruff format .`
 

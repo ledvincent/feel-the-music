@@ -49,7 +49,7 @@ The `mood` CLI SHALL read the working folders (inbox, processed, library, audio,
 
 #### Scenario: CPU-only PyTorch fails the check
 - **WHEN** the installed PyTorch has no CUDA support or sees no GPU
-- **THEN** the PyTorch check is marked failed with a hint to install the CUDA build
+- **THEN** the PyTorch check is marked failed, with a hint to install the CUDA build when PyTorch has no CUDA support, or to check the NVIDIA driver when the CUDA build sees no GPU
 
 #### Scenario: Doctor shows the folders
 - **WHEN** `mood doctor` runs

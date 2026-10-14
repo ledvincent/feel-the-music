@@ -2,7 +2,7 @@
 
 ## Context
 
-No code exists yet (see proposal.md, Why). The kickoff design fixed the module layout (`mood.cli`, `mood.config`, …) and the rule that the CLI is the only interface, with `--json` for Claude Code (`openspec/changes/archive/2026-10-12-mood-1-kickoff/design.md`). This design follows `okf/architecture/tech-stack.md`, `okf/decisions/001-claude-code-orchestrates-local-tools.md`, `okf/decisions/002-python-312-uv-windows-cuda.md` and `okf/decisions/003-one-gpu-model-at-a-time.md`.
+No code exists yet (see proposal.md, Why). The kickoff design fixed the module layout (`mood.cli`, `mood.config`, …) and the rule that the CLI is the only interface, with `--json` for Claude Code (`openspec/changes/archive/mood-1-kickoff-2026-10-12/design.md`). This design follows `okf/architecture/tech-stack.md`, `okf/decisions/001-claude-code-orchestrates-local-tools.md`, `okf/decisions/002-python-312-uv-windows-cuda.md` and `okf/decisions/003-one-gpu-model-at-a-time.md`.
 
 Code is written on a laptop without CUDA (Intel Arc) and run on the RTX 3060 Ti PC. Tests must pass on both, on CPU, with no network.
 
@@ -17,7 +17,7 @@ Code is written on a laptop without CUDA (Intel Arc) and run on the RTX 3060 Ti 
 
 ## Decisions
 
-**D1. src layout, package `mood`, console script `mood`.** `src/mood/` with `cli.py`, `config.py`, `doctor.py`; `[project.scripts] mood = "mood.cli:app"`. The src layout keeps tests running against the installed package. Alternative: flat layout; it lets tests import the working tree by accident.
+**D1. src layout, package `mood`, console script `mood`.** `src/mood/` with `cli.py`, `config.py`, `doctor.py`; `[project.scripts] mood = "mood.cli:run"`: a small wrapper around the Typer `app` that runs it without exiting, so usage errors such as an unknown command can be printed as JSON (spec: "Unknown command in JSON mode"); Typer alone prints them as text. The src layout keeps tests running against the installed package. Alternative: flat layout; it lets tests import the working tree by accident.
 
 **D2. Typer for the CLI.** Sub-commands as functions with type hints, good help text, built on Click. `--json` is accepted in both positions (spec: "Json flag in either position"): the root callback takes it before the command (`mood --json doctor`), and each command also declares it through one shared option helper (`mood doctor --json`, the order Claude naturally types). Either one sets JSON mode on the context. A test over all registered commands checks that none forgets the helper. Errors (unknown command, bad config) are caught at the top and printed as `{"ok": false, "error": "..."}` when `--json` is set. Alternatives: argparse (more boilerplate per command, no shared-option pattern), Click directly (Typer is Click with less code). Decision record needed: the CLI library shapes every later command.
 

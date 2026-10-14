@@ -15,7 +15,8 @@ Changing a line here is a decision: it needs a file in `/decisions/`.
 |---|---|---|
 | Language | Python | 3.12 ([002](/decisions/002-python-312-uv-windows-cuda.md)) |
 | Packaging | uv (`pyproject.toml`, `uv.lock`) | latest |
-| ML runtime | PyTorch, CUDA build | pinned in `uv.lock` |
+| ML runtime | PyTorch, CUDA 12.4 build from the `pytorch-cu124` index (torch only) | pinned in `uv.lock` |
+| Command line | Typer; `--json` before or after the command (design D2, D6 of `openspec/changes/archive/mood-2-project-skeleton-2026-10-14/design.md`) | pinned in `uv.lock` |
 | Shot store | LanceDB ([004](/decisions/004-lancedb-one-row-per-shot.md)) | pinned in `uv.lock` |
 | Look embeddings and tags | SigLIP `google/siglip-so400m-patch14-384`, fp16 ([005](/decisions/005-siglip-embeddings-and-tags.md)) | |
 | Video | FFmpeg, NVENC encoding | |
