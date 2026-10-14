@@ -21,6 +21,9 @@ tags: [jira]
 - Where: the description, under the heading "Acceptance criteria" (the project has no custom field for them)
 - Format: one bullet per criterion, `WHEN … THEN …`, the same shape as the spec scenarios
 
+## Dependencies
+- Link type: `Blocks` (outward `blocks`, inward `is blocked by`)
+
 ## Issue types
 | Use | Issue type |
 |---|---|

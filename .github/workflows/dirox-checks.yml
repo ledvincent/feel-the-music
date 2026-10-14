@@ -1,9 +1,11 @@
-# Dirox checks: the specs (OpenSpec) and the project knowledge (OKF) must be valid.
-# Added by /dirox-kit:setup-project. The OpenSpec version is pinned by the kit.
+# Dirox checks: the specs (OpenSpec) and the project knowledge (OKF) must be valid, and no PR
+# skips closing its change (OKF retro answered, finished change archived). Added by /dirox-kit:setup-project. The OpenSpec version is pinned by the kit.
 name: Dirox checks
 
 on:
   pull_request:
+    # edited: pr-checks reads the PR description, so it runs again when that changes.
+    types: [opened, synchronize, reopened, edited]
   push:
     branches: [main]
 
@@ -24,3 +26,19 @@ jobs:
         run: npx -y @fission-ai/openspec@1.14.1 validate --all --strict --no-interactive
       - name: OKF knowledge
         run: node .github/scripts/okf-validate.mjs okf
+
+  pr-checks:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: OKF retro answered, finished changes archived
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+        run: node .github/scripts/pr-check.mjs

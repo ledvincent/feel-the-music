@@ -12,13 +12,14 @@ OpenSpec change: <!-- openspec/changes/<change>/ (or archive/<change>-<date>/ on
 |---|---|---|
 
 ## Knowledge (okf/)
-<!-- Concepts added, updated or deprecated, or "No OKF change: <reason>". -->
+<!-- Concepts added, updated or deprecated, or "No OKF change: <reason>". Required: CI fails when this section is empty.
+     A decision marked "Decision record needed" that is not recorded: one "No decision record: <decision> - <reason>" line. -->
 
 ## Checklist
 - [ ] Big change only: proposal PR merged before code, BA and Architect approved
 - [ ] Every scenario has a test whose name contains the scenario name
 - [ ] `/dirox-kit:verify` has no blocking findings (not needed for trivial)
-- [ ] OKF retro done, and both CI checks pass (OpenSpec, OKF)
+- [ ] OKF retro done, and the Dirox CI checks pass (`specs-and-knowledge`, `pr-checks`)
 - [ ] OpenSpec change archived (not needed for trivial)
 
 ## Follow-ups
