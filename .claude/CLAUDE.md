@@ -23,7 +23,7 @@
 
 ## How we work
 - Tickets come from Jira. One ticket = one OpenSpec change named `<jira-key>-<short-name>` in lowercase = one branch `feature/<JIRA-KEY>-…` = one PR.
-- Project start: `/dirox-kit:kickoff <ID>`.
+- Project start: `/dirox-kit:kickoff <ID>` when there is no code yet; `/dirox-kit:baseline` for a project that already has code (run it again to catch up with code merged without the kit's commands).
 - Every ticket: `/dirox-kit:start-change` → `/dirox-kit:implement` → `/dirox-kit:verify` → `/dirox-kit:close-change`.
 - Sizes: trivial (no behaviour change: no OpenSpec change, normal PR review, no verify), normal (draft PR with the proposal; code follows in the same PR without waiting, reviewed together before merge), big (new module, data model, integration or security: proposal PR approved by BA and Architect and merged before code).
 - Big changes: no code before the proposal PR is merged. Approvals are PR reviews by people; never approve anything yourself.
@@ -36,7 +36,7 @@
 - Write each fact once. Link instead of copying.
 - Each spec scenario has a test whose name contains the scenario's name. Never change a test just to make it pass.
 - Tests come with the change. Run the test command before saying a task is finished.
-- Knowledge changes (new decision, term, integration, architecture) go into `okf/` in the same PR, at `/dirox-kit:close-change`, not while coding. A decision costly to reverse gets a file in `okf/decisions/`.
+- Knowledge changes (new decision, term, integration, architecture) go into `okf/` in the same PR, at `/dirox-kit:close-change`, not while coding. A decision costly to reverse gets a file in `okf/decisions/`. Every PR description fills its Knowledge section, even with `No OKF change: <reason>`: CI checks it.
 - `okf/**/index.md` files are generated: never edit them by hand.
 - Keep changes small and inside the change's tasks. Ask before refactoring anything else.
 
