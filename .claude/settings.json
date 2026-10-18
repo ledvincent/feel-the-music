@@ -1,4 +1,5 @@
 {
+  "model": "sonnet",
   "env": {
     "OPENSPEC_TELEMETRY": "0"
   },
