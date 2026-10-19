@@ -10,7 +10,7 @@ context: |
   instructions.
 rules:
   proposal:
-    - 'Start the file with two lines before the first heading: "Jira: <KEY-123>" and "Size: normal" or "Size: big" (the size the person confirmed). /dirox-kit:start-change adds two more once the design is written: "Difficulty: routine" or "Difficulty: tricky", then "Tier: light", "Tier: standard" or "Tier: heavy".'
+    - 'Start the file with two lines before the first heading: "Jira: <KEY-123>" and "Size: normal" or "Size: big" (the size from /dirox-kit:start-change). /dirox-kit:start-change adds two more once the design is written: "Difficulty: routine" or "Difficulty: tricky", then "Tier: light", "Tier: standard" or "Tier: heavy".'
     - State what is out of scope.
     - 'If a scenario is not an acceptance criterion in the Jira ticket, list it under a "Not in Jira yet" heading; the ticket owner adds it to Jira before approving.'
     - 'Include a "## Criteria coverage" section: a table of each acceptance criterion (WHEN/THEN) with its source (Jira, a spec requirement, a checklist row, a decision), then "Considered, not needed" with a reason for each, then any open question left.'

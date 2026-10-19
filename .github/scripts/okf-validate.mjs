@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // okf-validate.mjs: checks an OKF v0.2 bundle and generates its index.md files.
-// Part of dirox-kit 1.0.0. /dirox-kit:setup-project copies it into projects as
+// Part of dirox-kit 1.13.0. /dirox-kit:setup-project copies it into projects as
 // .github/scripts/okf-validate.mjs and replaces it on later runs: do not edit the copy.
 // No dependencies: Node 20 or later.
 //
@@ -13,7 +13,9 @@
 // Errors: the OKF conformance rules (frontmatter, non-empty `type`, reserved index.md and
 // log.md structures) plus two Dirox rules: every concept has an `owner`, and every index.md
 // matches what this script generates. Warnings: broken links (OKF readers must tolerate
-// them), missing title or description, unknown status, passed stale_after.
+// them), missing title or description, unknown status, passed stale_after, and two decisions
+// sharing a number (NNN-*.md, from two PRs merged at once; new decisions are named after
+// their ticket instead).
 
 import fs from "node:fs";
 import path from "node:path";
@@ -326,6 +328,19 @@ for (const { file, content } of indexes(tree, true)) {
     : "out of date: run `node okf-validate.mjs --write` (index files are generated, never edited by hand)");
 }
 checkReserved(walk(bundle), true);
+
+// Numbered decisions (NNN-title.md) written by two PRs at once can take the same number.
+const decisionsDir = path.join(bundle, "decisions");
+if (fs.existsSync(decisionsDir)) {
+  const byNumber = new Map();
+  for (const name of fs.readdirSync(decisionsDir)) {
+    const m = name.match(/^(\d+)-.*\.md$/);
+    if (m) byNumber.set(Number(m[1]), [...(byNumber.get(Number(m[1])) || []), name]);
+  }
+  for (const names of byNumber.values()) {
+    if (names.length > 1) warn(decisionsDir, `decisions share a number: ${names.join(", ")}. Rename the newer one after its ticket (<KEY-123>-short-title.md) and fix the links to it`);
+  }
+}
 
 const errors = findings.filter((f) => f.level === "error");
 const warnings = findings.filter((f) => f.level === "warning");

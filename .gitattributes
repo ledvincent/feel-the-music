@@ -1,0 +1,4 @@
+# Dirox kit: okf/log.md only ever gains lines, so a merge keeps both sides' lines instead of
+# stopping. GitHub's web conflict editor ignores this; /dirox-kit:close-change merges locally.
+# Generated index.md files are not listed: they are regenerated, never merged.
+okf/log.md merge=union
