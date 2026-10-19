@@ -24,7 +24,7 @@
 ## How we work
 - Tickets come from Jira. One ticket = one OpenSpec change named `<jira-key>-<short-name>` in lowercase = one branch `feature/<JIRA-KEY>-…` = one PR.
 - Project start: `/dirox-kit:kickoff <ID>` when there is no code yet; `/dirox-kit:baseline` for a project that already has code (run it again to catch up with code merged without the kit's commands).
-- Every ticket: `/dirox-kit:start-change` → `/dirox-kit:implement` → `/dirox-kit:verify` → `/dirox-kit:close-change`.
+- Every ticket: `/dirox-kit:start-change` → `/dirox-kit:implement` (builds, verifies, commits and offers to push; a normal change can go straight on from start-change) → `/dirox-kit:close-change`. `/dirox-kit:verify` re-checks a change on its own, for QC or after fixes.
 - Sizes: trivial (no behaviour change: no OpenSpec change, normal PR review, no verify), normal (draft PR with the proposal; code follows in the same PR without waiting, reviewed together before merge), big (new module, data model, integration or security: proposal PR approved by BA and Architect and merged before code).
 - Big changes: no code before the proposal PR is merged. Approvals are PR reviews by people; never approve anything yourself.
 - Status lives in Jira, not in the repo.
