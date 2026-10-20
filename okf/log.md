@@ -1,5 +1,8 @@
 # Knowledge log
 
+## 2026-10-20
+* **Updated**: [Jira](/integrations/jira.md) - ticket labels section (`src:`, `cap:`, `size:`, `difficulty:`), from /dirox-kit:jira setup
+
 ## 2026-10-14
 * **Updated**: [Jira](/integrations/jira.md) - link type for dependencies (`Blocks`), used for the MOOD-1 backlog links
 * **Updated**: [Tech stack](/architecture/tech-stack.md) - Typer for the CLI and the CUDA 12.4 PyTorch index, chosen in MOOD-2
