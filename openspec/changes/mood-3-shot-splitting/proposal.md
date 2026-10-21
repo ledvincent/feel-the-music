@@ -1,5 +1,6 @@
 Jira: MOOD-3
 Size: big
+QC: none
 Difficulty: tricky
 Tier: heavy
 
