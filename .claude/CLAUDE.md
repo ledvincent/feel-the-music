@@ -37,6 +37,7 @@
 - Read Jira freely, but write to it (create, edit, comment, move) only through the `/dirox-kit:` commands, never with the Atlassian tools directly. When work needs a new ticket, ask "I'd like to run `/dirox-kit:jira create` to draft a ticket for <the work>. Run it?" and start it only on yes. A new ticket gets acceptance criteria only when they are already concrete (a QC bug, the owner's correction), and never design choices: `/dirox-kit:start-change` settles those when the ticket starts.
 - Write each fact once. Link instead of copying.
 - Each spec scenario has a test whose name contains the scenario's name. Never change a test just to make it pass.
+- Test cases live in `test-cases/<KEY>.md` (`test-cases/README.md`). Each `Proof: automated` case has a test whose name contains its ID. Never edit a test case file marked `qc: required`: QC owns it; ask in the PR instead. Add cases only through `/dirox-kit:test-cases`.
 - Tests come with the change. Run the test command before saying a task is finished.
 - Knowledge changes (new decision, term, integration, architecture) go into `okf/` in the same PR, at `/dirox-kit:close-change`, not while coding. A decision costly to reverse gets a file in `okf/decisions/`. Every PR description fills its Knowledge section, even with `No OKF change: <reason>`: CI checks it.
 - `okf/**/index.md` files are generated: never edit them by hand.

@@ -1,0 +1,4 @@
+# QC reviewers: the GitHub users whose approval lets a "qc: required" ticket's PR merge.
+# One GitHub username per line, without the @ (for example jane-qc). Lines starting with # are ignored.
+# The Dirox PR checks (.github/scripts/pr-check.mjs) read this file; /dirox-kit:close-change asks them to review.
+ledvincent

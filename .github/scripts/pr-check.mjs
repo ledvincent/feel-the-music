@@ -2,7 +2,7 @@
 // pr-check.mjs: checks on a pull request that closing a change was not skipped: the OKF retro
 // is answered, a finished OpenSpec change is archived, verified and proven by its tests, and a
 // big change's proposal was approved before its code.
-// Part of dirox-kit 1.13.0. /dirox-kit:setup-project copies it into projects as
+// Part of dirox-kit 1.18.0. /dirox-kit:setup-project copies it into projects as
 // .github/scripts/pr-check.mjs and replaces it on later runs: do not edit the copy.
 // No dependencies: Node 20 or later. Run by .github/workflows/dirox-checks.yml on pull requests,
 // so it holds whether or not /dirox-kit:close-change or /dirox-kit:review-pr were run.
@@ -10,6 +10,9 @@
 // Environment:
 //   PR_BODY         the PR description
 //   PR_AUTHOR_TYPE  "Bot" skips every check (dependency bots do not fill the template)
+//   PR_HEAD_REF     the PR's branch, for the ticket key (check 11)
+//   PR_NUMBER, PR_HEAD_SHA, GITHUB_TOKEN, GITHUB_REPOSITORY
+//                   to read the PR's reviews for the QC approval (check 11); without them it warns
 //   BASE_REF        the base to compare with (for example origin/main). In CI it can stay
 //                   unset: the checkout is the PR's merge commit, compared with its first parent.
 //                   Check 8 reads the history: check out with fetch-depth 0.
@@ -35,6 +38,13 @@
 //   7. A big change's proposal is added in the same PR as code: the proposal is approved and
 //      merged in its own PR first. Code is any file outside openspec/, okf/, .claude/, .github/
 //      and Markdown files.
+//   9. A test case file this PR adds or changes (test-cases/<KEY>.md) is not well formed
+//      (test-cases-check.mjs, which sits next to this script).
+//  10. A change archived by this PR has a test case file, and an automated case has no Proof task,
+//      or a case is missing from the verification.
+//  11. The PR's ticket is marked "qc: required" in its test case file, the PR changes code, and no
+//      QC reviewer listed in .github/qc-reviewers has approved it (their latest review), or the
+//      PR's code changed since the approval (qc-approval.mjs, which sits next to this script).
 // Warnings:
 //   4. The PR touches structural paths (schema, dependencies, deployment, env files) and changes
 //      nothing in okf/. The paths come from .github/okf-triggers.json when it exists
@@ -303,6 +313,80 @@ for (const dir of archived) {
     if (dropped.length) {
       const shown = dropped.slice(0, 3).map((l) => `"${l.slice(0, 80)}"`).join(", ") + (dropped.length > 3 ? ` and ${dropped.length - 3} more` : "");
       report("warning", `${file} loses lines another change added after ${id} started: ${shown}. If they were not meant to go, add them back to ${id}'s spec.`, "Spec lines dropped");
+    }
+  }
+}
+
+// 9-11. Test cases (test-cases/<KEY>.md). The checker sits next to this script; a project set up
+// before kit 1.17.0 has no copy, so the checks are skipped with a warning.
+let testCases = null;
+try {
+  testCases = await import(new URL("./test-cases-check.mjs", import.meta.url));
+} catch {
+  if (fs.existsSync("test-cases")) report("warning", "test-cases-check.mjs is missing next to pr-check.mjs, so the test cases were not checked. Run /dirox-kit:setup-project.", "Test cases");
+}
+const keyOf = (s) => ((s || "").match(/[A-Z][A-Z0-9]*-\d+/i) || [""])[0].toUpperCase();
+const readCases = (key) => {
+  const file = `test-cases/${key}.md`;
+  return key && testCases && fs.existsSync(file) ? testCases.checkTestCases(fs.readFileSync(file, "utf8"), file) : null;
+};
+if (testCases) {
+  // 9. Every test case file this PR adds or changes is well formed.
+  for (const { status, file } of changed) {
+    if (status === "D" || !/^test-cases\/[^/]+\.md$/.test(file) || /README\.md$/i.test(file) || !fs.existsSync(file)) continue;
+    for (const e of testCases.checkTestCases(fs.readFileSync(file, "utf8"), file).errors) report("error", e, "Test cases");
+  }
+  // 10. A change archived by this PR: every automated case has a Proof task, and the verification covers every case.
+  for (const dir of archived) {
+    const id = changeId(dir);
+    const tc = readCases(keyOf(id));
+    if (!tc || !tc.cases.length) continue;
+    const root = path.join("openspec/changes/archive", dir);
+    const tasks = fs.existsSync(path.join(root, "tasks.md")) ? squash(fs.readFileSync(path.join(root, "tasks.md"), "utf8")) : "";
+    const noTask = tc.cases.filter((c) => c.proof === "automated" && !tasks.includes(squash(c.id))).map((c) => c.id);
+    if (noTask.length) report("error", `${id}: the automated test cases ${noTask.join(", ")} have no Proof task. Add "Test \`<case ID>\` in \`<file>\`" tasks and their tests, then /dirox-kit:verify.`, "Test cases");
+    const vfile = path.join(root, "verification.md");
+    if (fs.existsSync(vfile)) {
+      const v = squash(fs.readFileSync(vfile, "utf8"));
+      const uncovered = tc.cases.filter((c) => !v.includes(squash(c.id))).map((c) => c.id);
+      if (uncovered.length) report("error", `${id}: the verification does not cover the test cases ${uncovered.join(", ")} (added after it ran?). Run /dirox-kit:verify again.`, "Test cases");
+    }
+  }
+}
+
+// 11. A ticket marked "qc: required": the code merges only once a QC reviewer approved the PR, and
+// the PR's code has not changed since (qc-approval.mjs: a base merge or an archive keeps the approval).
+const prKey = keyOf(process.env.PR_HEAD_REF) || keyOf(archived.map(changeId)[0]);
+const qcCases = readCases(prKey);
+if (qcCases && qcCases.qc === "required" && code.length) {
+  let qc = null;
+  try {
+    qc = await import(new URL("./qc-approval.mjs", import.meta.url));
+  } catch {
+    report("error", `${prKey} needs QC, but qc-approval.mjs is missing next to pr-check.mjs. Run /dirox-kit:setup-project.`, "QC approval");
+  }
+  const { GITHUB_TOKEN, GITHUB_REPOSITORY, PR_NUMBER, PR_HEAD_SHA } = process.env;
+  const reviewers = qc ? qc.readReviewers() : [];
+  if (!qc) {
+    // reported above
+  } else if (!reviewers.length) {
+    report("error", qc.explain({ reason: "no-reviewers" }, prKey), "QC approval");
+  } else if (!GITHUB_TOKEN || !GITHUB_REPOSITORY || !PR_NUMBER) {
+    report("warning", `${prKey} needs a QC approval (${reviewers.join(", ")}); it could not be checked here (no GitHub token or PR number).`, "QC approval");
+  } else {
+    let reviews = null;
+    try {
+      const api = process.env.GITHUB_API_URL || "https://api.github.com";
+      const res = await fetch(`${api}/repos/${GITHUB_REPOSITORY}/pulls/${PR_NUMBER}/reviews?per_page=100`, {
+        headers: { Authorization: `Bearer ${GITHUB_TOKEN}`, Accept: "application/vnd.github+json" },
+      });
+      if (res.ok) reviews = await res.json();
+    } catch { /* reported below */ }
+    if (!reviews) {
+      report("error", `${prKey} needs a QC approval, and the reviews could not be read from GitHub. Re-run the check.`, "QC approval");
+    } else {
+      const v = qc.checkQcApproval({ reviews, reviewers, base, head: PR_HEAD_SHA || head });
+      if (!v.ok) report("error", qc.explain(v, prKey), "QC approval");
     }
   }
 }
