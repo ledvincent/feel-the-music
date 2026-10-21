@@ -11,6 +11,12 @@ OpenSpec change: <!-- openspec/changes/<change>/ (or archive/<change>-<date>/ on
 | Requirement | Scenario | Test |
 |---|---|---|
 
+## Test cases
+<!-- From test-cases/<KEY>.md and the verification. First line: "QC: required" or "QC: none".
+     One row per case; a manual case shows "QC" as its test. With QC required, CI waits for a QC reviewer's approval. -->
+| Case | Title | Proof | Test | Result |
+|---|---|---|---|---|
+
 ## Knowledge (okf/)
 <!-- Concepts added, updated or deprecated, or "No OKF change: <reason>". Required: CI fails when this section is empty.
      A decision marked "Decision record needed" that is not recorded: one "No decision record: <decision> - <reason>" line. -->

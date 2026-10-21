@@ -1,6 +1,4 @@
 {
-  "model": "sonnet",
-  "effortLevel": "medium",
   "env": {
     "OPENSPEC_TELEMETRY": "0"
   },
@@ -20,17 +18,39 @@
       "Bash(git checkout -- :*)",
       "Bash(gh pr merge:*)",
       "Bash(gh pr review:*)"
+    ],
+    "allow": [
+      "Bash(openspec --version)",
+      "Bash(openspec list:*)",
+      "Bash(openspec show:*)",
+      "Bash(openspec status:*)",
+      "Bash(openspec validate:*)",
+      "Bash(node .github/scripts/okf-validate.mjs:*)",
+      "Bash(node .github/scripts/pr-check.mjs:*)",
+      "Bash(node --version)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git blame:*)",
+      "Bash(git fetch:*)",
+      "Bash(git branch --show-current)",
+      "Bash(git branch -r --list:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git merge-base:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git cat-file:*)",
+      "Bash(git symbolic-ref --short refs/remotes/origin/HEAD)",
+      "Bash(gh --version)",
+      "Bash(gh auth status)",
+      "Bash(gh pr view:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr checks:*)",
+      "Bash(gh pr diff:*)",
+      "Bash(gh repo view:*)"
     ]
   },
-  "extraKnownMarketplaces": {
-    "dirox": {
-      "source": {
-        "source": "github",
-        "repo": "dirox-official/dirox-claude-kit"
-      }
-    }
-  },
-  "enabledPlugins": {
-    "dirox-kit@dirox": true
-  }
+  "model": "sonnet",
+  "enabledPlugins": {},
+  "effortLevel": "medium"
 }

@@ -25,6 +25,7 @@ rules:
   tasks:
     - Each step leaves the code working and testable.
     - 'End with a group named "Proof": one task per scenario, written as "Test `<scenario name>` in `<test file>`". The test name contains the scenario name.'
+    - 'When test-cases/<KEY>.md exists, the Proof group also has one task per case marked "Proof: automated", written as "Test `<case ID>` in `<test file>`" (for example "Test `PROJ-123-04` in `src/reactions.test.ts`"); the test name contains the case ID. One test can carry both a scenario name and case IDs. Cases marked manual are run by QC and get no task.'
 
 # Per-operation guidance (optional)
 # Add advisory guidance for how apply and archive work should be conducted.

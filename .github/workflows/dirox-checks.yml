@@ -1,16 +1,21 @@
 # Dirox checks: the specs (OpenSpec) and the project knowledge (OKF) must be valid, and no PR
-# skips closing its change (OKF retro answered, finished change archived). Added by /dirox-kit:setup-project. The OpenSpec version is pinned by the kit.
+# skips closing its change (OKF retro answered, finished change archived, test cases proven, QC approval
+# when the ticket needs QC). Added by /dirox-kit:setup-project. The OpenSpec version is pinned by the kit.
 name: Dirox checks
 
 on:
   pull_request:
     # edited: pr-checks reads the PR description, so it runs again when that changes.
     types: [opened, synchronize, reopened, edited]
+  # A QC reviewer's approval (or its dismissal) runs pr-checks again: it is the QC gate.
+  pull_request_review:
+    types: [submitted, dismissed]
   push:
     branches: [main]
 
 permissions:
   contents: read
+  pull-requests: read
 
 jobs:
   specs-and-knowledge:
@@ -28,7 +33,7 @@ jobs:
         run: node .github/scripts/okf-validate.mjs okf
 
   pr-checks:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_review'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -38,8 +43,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      - name: OKF retro answered, finished changes archived
+      - name: OKF retro answered, finished changes archived and proven, QC approval
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+          PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: node .github/scripts/pr-check.mjs
