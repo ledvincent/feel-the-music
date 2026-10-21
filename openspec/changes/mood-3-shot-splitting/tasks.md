@@ -22,7 +22,7 @@
 ## 4. The ingest pass and `mood ingest`
 
 - [ ] 4.1 Write `mood.ingest.inbox`: walk `inbox/` at any depth, sort files into videos (fixed extensions, any case) and ignored files, name each by its path relative to `inbox/` with forward slashes, and raise `ConfigError` naming the path and the fix when `inbox/` is missing (design D12, D13); verify with unit tests
-- [ ] 4.2 Write `mood.ingest.run.ingest(config, splitter_factory)`: hash, skip known hashes, load the splitter only when a file is left, open-check and split each file, store it right away, fail a file with its reason (unreadable, or any splitter error) and go on with the same splitter, free the splitter, build the report (design D8, D10, D11); verify with tests using `FakeSplitter`
+- [ ] 4.2 Write `mood.ingest.run.ingest(config, splitter_factory)`: hash in path order, skip known hashes and any hash an earlier file of the same run already has (reason `same content as <first file>`), load the splitter only when a file is left, open-check and split each file, store it right away, fail a file with its reason (unreadable, or any splitter error) and go on with the same splitter, free the splitter, build the report (design D8, D10, D11); verify with tests using `FakeSplitter`
 - [ ] 4.3 Add the `ingest` command to `src/mood/cli.py` with the shared `--json` option, the text renderer, and exit code 1 when any file failed; verify `tests/test_cli.py::test_every_command_accepts_json` passes for `ingest` in an empty project
 - [ ] 4.4 Add `mood ingest` to the Commands section of `CLAUDE.md` and verify it runs as written
 
@@ -55,3 +55,26 @@ The scenario "Processed file leaves inbox" is unchanged and belongs to backlog r
 - [ ] 6.17 Test `Fallback splitter used` in `tests/test_split.py`
 - [ ] 6.18 Test `Interrupted file ingested again` in `tests/test_library.py`
 - [ ] 6.19 Test `Ingest JSON report` in `tests/test_ingest.py`
+- [ ] 6.20 Test `Same content twice in one run` in `tests/test_ingest.py`
+
+Test cases from `test-cases/MOOD-3.md` (qc: none). Each automated case has a test whose name contains its ID; it can be the scenario test named in brackets. Manual cases MOOD-3-03 and MOOD-3-21 are run in tasks 5.1 and 5.3 and get no task.
+
+- [ ] 6.21 Test `MOOD-3-01` in `tests/test_ingest.py` (with `Shots follow cuts`)
+- [ ] 6.22 Test `MOOD-3-02` in `tests/test_library.py` (with `Source row recorded`)
+- [ ] 6.23 Test `MOOD-3-04` in `tests/test_ingest.py` (with `Ingest JSON report`)
+- [ ] 6.24 Test `MOOD-3-05` in `tests/test_ingest.py` (with `Already ingested file skipped`)
+- [ ] 6.25 Test `MOOD-3-06` in `tests/test_ingest.py` (with `Renamed copy skipped`)
+- [ ] 6.26 Test `MOOD-3-07` in `tests/test_split.py` (with `Video without cuts`)
+- [ ] 6.27 Test `MOOD-3-08` in `tests/test_ingest.py` (with `Video in subfolder ingested`)
+- [ ] 6.28 Test `MOOD-3-09` in `tests/test_split.py` (with `Fallback splitter used`)
+- [ ] 6.29 Test `MOOD-3-10` in `tests/test_split.py` (with `Short shot dropped`)
+- [ ] 6.30 Test `MOOD-3-11` in `tests/test_split.py` (a shot of exactly 1.0 s is kept)
+- [ ] 6.31 Test `MOOD-3-12` in `tests/test_ingest.py` (with `Unreadable file reported`)
+- [ ] 6.32 Test `MOOD-3-13` in `tests/test_ingest.py` (with `Splitter fails on one file`)
+- [ ] 6.33 Test `MOOD-3-14` in `tests/test_ingest.py` (with `Non-video file ignored`)
+- [ ] 6.34 Test `MOOD-3-15` in `tests/test_ingest.py` (video extensions in any letter case)
+- [ ] 6.35 Test `MOOD-3-16` in `tests/test_ingest.py` (with `Nothing to ingest`)
+- [ ] 6.36 Test `MOOD-3-17` in `tests/test_ingest.py` (with `Missing inbox reported`)
+- [ ] 6.37 Test `MOOD-3-18` in `tests/test_library.py` (with `Interrupted file ingested again`)
+- [ ] 6.38 Test `MOOD-3-19` in `tests/test_ingest.py` (with `Splitter freed after split`)
+- [ ] 6.39 Test `MOOD-3-20` in `tests/test_ingest.py` (with `Same content twice in one run`)

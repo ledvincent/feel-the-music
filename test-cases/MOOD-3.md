@@ -9,7 +9,7 @@ cap: footage-ingest
 ## Open questions
 - [x] After a successful ingest, is the video moved from `inbox/` to `processed/` in this ticket, or later? Answer: later. MOOD-3 never moves or deletes files; moving to `processed/` is MOOD-8 (keeper export). Design D10, D12.
 - [x] Where does a skipped file (content already in the library) end up? Answer: it stays in `inbox/`, for the same reason.
-- [x] When two files with the same content are both new in one run, is the first ingested and the second reported as skipped? Answer (owner, 2026-10-22): yes. Files are taken in path order; the first is ingested, the later one is reported as skipped ("already ingested"). MOOD-3-20.
+- [x] When two files with the same content are both new in one run, is the first ingested and the second reported as skipped? Answer (owner, 2026-10-22): yes. Files are taken in path order; the first is ingested, the later one is reported as skipped, with a reason naming the first file. MOOD-3-20.
 - [x] When every shot of a video is shorter than 1 s, how is it reported? Answer: it is ingested with a Source row, `shot_count` 0 and no Shot rows, so it is not split again. Design D5.
 - [x] When neither TransNetV2 nor PySceneDetect can be loaded, what does ingest do? Answer (owner, 2026-10-22): every video fails with that reason, no rows are written, and ingest exits non-zero. PySceneDetect runs on CPU with no model, so no case is written for it.
 - [x] Exact wording of the plain-text report lines? Answer: the cases check the meaning. The design fixes "Nothing to ingest in <inbox>" and the missing-inbox message (D11, D13).
@@ -414,7 +414,7 @@ Steps:
 2. List the Shot and Source rows.
 
 Expected:
-1. `test-clip-three-takes.mp4` (first in path order) is ingested with 3 shots; `test-folder/same-clip.mp4` is reported as skipped (already ingested).
+1. `test-clip-three-takes.mp4` (first in path order) is ingested with 3 shots; `test-folder/same-clip.mp4` is reported as skipped, with a reason naming the first file.
 2. The library holds exactly one Source row and 3 Shot rows for that content.
 
 ## MOOD-3-21 · Shots match the real cuts of real footage
