@@ -6,7 +6,8 @@ name: Dirox checks
 on:
   pull_request:
     # edited: pr-checks reads the PR description, so it runs again when that changes.
-    types: [opened, synchronize, reopened, edited]
+    # ready_for_review: on a draft, pr-checks only warns; marking it ready makes them errors.
+    types: [opened, synchronize, reopened, edited, ready_for_review]
   # A QC reviewer's approval (or its dismissal) runs pr-checks again: it is the QC gate.
   pull_request_review:
     types: [submitted, dismissed]
@@ -47,6 +48,7 @@ jobs:
         env:
           PR_BODY: ${{ github.event.pull_request.body }}
           PR_AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+          PR_DRAFT: ${{ github.event.pull_request.draft }}
           PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
