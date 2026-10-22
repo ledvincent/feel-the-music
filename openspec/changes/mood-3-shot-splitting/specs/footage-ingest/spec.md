@@ -51,7 +51,7 @@ For each ingested video the library SHALL hold exactly one Source row with the f
 - **THEN** one Source row holds its content hash, its path, its ingest time, its shot count (equal to its number of Shot rows) and the splitter used
 
 ### Requirement: Skip content already ingested
-Ingest SHALL recognise a file by the hash of its content, not by its name or path. A file whose content hash is already in the library SHALL add no rows and SHALL be reported as skipped. Knowledge: `okf/data/shot.md`
+Ingest SHALL recognise a file by the hash of its content, not by its name or path. A file whose content hash is already in the library SHALL add no rows and SHALL be reported as skipped. When several new files in one run have the same content, only the first in path order SHALL be ingested; the others SHALL add no rows and SHALL be reported as skipped. Knowledge: `okf/data/shot.md`
 
 #### Scenario: Already ingested file skipped
 - **WHEN** `mood ingest` runs again on a file it has already ingested
@@ -60,6 +60,10 @@ Ingest SHALL recognise a file by the hash of its content, not by its name or pat
 #### Scenario: Renamed copy skipped
 - **WHEN** `inbox/` holds a renamed copy of a file whose content is already in the library
 - **THEN** no Shot or Source row is added and the copy is reported as skipped
+
+#### Scenario: Same content twice in one run
+- **WHEN** `inbox/` holds two files with the same content, neither of them in the library yet, and `mood ingest` runs
+- **THEN** the first in path order is ingested, and the other adds no Shot or Source row and is reported as skipped
 
 ### Requirement: Drop shots under one second
 Ingest SHALL NOT store a shot shorter than 1 second, and SHALL report for each file how many shots it dropped for being too short. Knowledge: `okf/domain/shot.md`
