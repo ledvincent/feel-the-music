@@ -73,11 +73,11 @@ Open questions: none.
 
 ## Not in Jira yet
 
-- WHEN two new files in one run have the same content THEN only the first in path order is ingested and the other is reported as skipped
+None: all criteria written to MOOD-3 on 2026-10-22 09:54.
 
 ## Jira acceptance criteria
 
-Read from MOOD-3 on 2026-10-20 00:37
+Read from MOOD-3 on 2026-10-22 09:54
 - WHEN a video file is in `inbox/` and `mood ingest` runs THEN the library holds one Shot row per continuous take, with its source file, source hash, start, end and duration in seconds
 - WHEN a video is ingested THEN one Source row holds its content hash, path, ingest time, shot count and the splitter used
 - WHEN ingest runs on a file whose content is already in the library (same file, or a renamed copy) THEN no rows are added and the file is reported as skipped
@@ -92,3 +92,4 @@ Read from MOOD-3 on 2026-10-20 00:37
 - WHEN `mood ingest --json` runs THEN it prints one JSON document listing each file with its outcome (ingested with shot count, skipped, failed with reason, ignored)
 - WHEN a video is in a subfolder of `inbox/` THEN it is ingested like a top-level video
 - WHEN `inbox/` does not exist THEN ingest stops with a message naming the path and how to fix it, and exits non-zero
+- WHEN two new files in one run have the same content THEN only the first in path order is ingested and the other is reported as skipped
