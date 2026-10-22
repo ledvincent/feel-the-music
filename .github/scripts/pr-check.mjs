@@ -2,7 +2,7 @@
 // pr-check.mjs: checks on a pull request that closing a change was not skipped: the OKF retro
 // is answered, a finished OpenSpec change is archived, verified and proven by its tests, and a
 // big change's proposal was approved before its code.
-// Part of dirox-kit 1.18.0. /dirox-kit:setup-project copies it into projects as
+// Part of dirox-kit 1.25.2. /dirox-kit:setup-project copies it into projects as
 // .github/scripts/pr-check.mjs and replaces it on later runs: do not edit the copy.
 // No dependencies: Node 20 or later. Run by .github/workflows/dirox-checks.yml on pull requests,
 // so it holds whether or not /dirox-kit:close-change or /dirox-kit:review-pr were run.
@@ -10,6 +10,10 @@
 // Environment:
 //   PR_BODY         the PR description
 //   PR_AUTHOR_TYPE  "Bot" skips every check (dependency bots do not fill the template)
+//   PR_DRAFT        "true" for a draft PR: every error is reported as a warning, since a draft
+//                   cannot merge and the kit opens drafts long before /dirox-kit:close-change
+//                   writes the Knowledge section, archives the change and QC approves. The
+//                   workflow runs again when the PR is marked ready, and then they are errors.
 //   PR_HEAD_REF     the PR's branch, for the ticket key (check 11)
 //   PR_NUMBER, PR_HEAD_SHA, GITHUB_TOKEN, GITHUB_REPOSITORY
 //                   to read the PR's reviews for the QC approval (check 11); without them it warns
@@ -73,9 +77,14 @@ const DEFAULT_TRIGGERS = {
 const IGNORED = [".github/workflows/dirox-checks.yml", ".github/scripts/**"];
 
 const inActions = Boolean(process.env.GITHUB_ACTIONS);
+const draft = process.env.PR_DRAFT === "true";
 let errors = 0;
 let warnings = 0;
 function report(level, msg, title = "OKF retro") {
+  if (level === "error" && draft) {
+    level = "warning";
+    msg += " (Draft PR: this becomes an error once the PR is ready for review; /dirox-kit:close-change does it.)";
+  }
   if (level === "error") errors++;
   else warnings++;
   console.log(inActions ? `::${level} title=${title}::${msg}` : `${level === "error" ? "ERROR" : "WARN "} ${msg}`);
@@ -391,5 +400,5 @@ if (qcCases && qcCases.qc === "required" && code.length) {
   }
 }
 
-console.log(`pr-check: ${changed.length} file(s) changed, ${neededTotal} decision(s) to record, ${archived.length} change(s) closed, ${errors} error(s), ${warnings} warning(s)`);
+console.log(`pr-check: ${draft ? "draft PR, errors reported as warnings, " : ""}${changed.length} file(s) changed, ${neededTotal} decision(s) to record, ${archived.length} change(s) closed, ${errors} error(s), ${warnings} warning(s)`);
 process.exit(errors ? 1 : 0);
